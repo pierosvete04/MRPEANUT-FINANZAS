@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.claude/
+.vercel/
+~$*.xlsx
+.DS_Store
+Thumbs.db

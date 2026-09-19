@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MR. PEANUTT · Centro de Costos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================================
+     MR. PEANUTT -- paleta "mantequilla de maní": cacao #4A2C17 · caramelo #D98C2B · miel #E8B04B ·
+     crema #F6EBD9. Positivo = verde oliva #4A7C59, atención = caramelo, crítico = ladrillo #B3412E.
+     Tipografía: Bebas Neue (títulos, caja alta) + DM Sans (todo lo demás).
+     ============================================================================ */
+  :root {
+    --font-display: "Bebas Neue", "Oswald", "Arial Narrow", Impact, sans-serif;
+    --font-body: "DM Sans", Inter, "Segoe UI", Helvetica, Arial, sans-serif;
+    --cacao: #4A2C17; --cacao-deep: #33200F; --caramelo: #D98C2B; --caramelo-ink: #8A5312; --miel: #E8B04B; --crema: #F6EBD9;
+    color-scheme: light;
+    --page-bg: #F6EBD9; --surface: #FFFFFF; --surface-2: #FBF6EE;
+    --text-primary: #2E1B0E; --text-secondary: #5C4632; --muted: #8A7560;
+    --border: rgba(74,44,23,0.14); --border-strong: rgba(74,44,23,0.28); --gridline: #EADFCF;
+    --accent: #4A2C17; --accent-ink: #33200F; --accent-soft: #F4E1C2; --accent-soft-border: #E8B04B;
+    --masthead-bg: #4A2C17; --masthead-text: #FFFFFF; --masthead-muted: #E8B04B;
+    --good: #4A7C59; --good-text: #35603F; --warning: #D98C2B; --warning-text: #8A5312; --critical: #B3412E; --critical-text: #8F2E1F;
+    --s1: #4A2C17; --s2: #D98C2B; --s3: #E8B04B; --s4: #A58B6F;
+    --chip-bg: #4A2C17; --chip-text: #FFFFFF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page-bg: #1A120C; --surface: #241A12; --surface-2: #2E2218;
+      --text-primary: #F3E9DC; --text-secondary: #CBB9A4; --muted: #9B8974;
+      --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.22); --gridline: #3A2C20;
+      --accent: #E8B04B; --accent-ink: #F4D28A; --accent-soft: rgba(232,176,75,0.14); --accent-soft-border: rgba(232,176,75,0.4);
+      --masthead-bg: #33200F; --good: #7DB88C; --good-text: #9AD1A6; --warning-text: #F0B36A; --critical-text: #F08A78;
+      --s1: #E8B04B; --s2: #D98C2B; --s3: #A58B6F; --s4: #6E5A46; --chip-bg: #E8B04B; --chip-text: #33200F;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page-bg: #1A120C; --surface: #241A12; --surface-2: #2E2218;
+    --text-primary: #F3E9DC; --text-secondary: #CBB9A4; --muted: #9B8974;
+    --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.22); --gridline: #3A2C20;
+    --accent: #E8B04B; --accent-ink: #F4D28A; --accent-soft: rgba(232,176,75,0.14); --accent-soft-border: rgba(232,176,75,0.4);
+    --masthead-bg: #33200F; --good: #7DB88C; --good-text: #9AD1A6; --warning-text: #F0B36A; --critical-text: #F08A78;
+    --s1: #E8B04B; --s2: #D98C2B; --s3: #A58B6F; --s4: #6E5A46; --chip-bg: #E8B04B; --chip-text: #33200F;
+  }
+
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--page-bg); color: var(--text-primary); font-family: var(--font-body); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  .cc-shell { max-width: 1180px; margin: 0 auto; padding: 10px 20px 64px; }
+
+  .cc-masthead { background: var(--masthead-bg); color: var(--masthead-text); position: relative; }
+  .cc-masthead::after { content: ''; display: block; height: 26px; background: var(--page-bg); clip-path: ellipse(58% 100% at 50% 100%); }
+  .cc-header { max-width: 1180px; margin: 0 auto; padding: 26px 20px 30px; display: flex; align-items: center; justify-content: space-between; gap: 22px; flex-wrap: wrap; }
+  .cc-header-brand { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .cc-logo { width: 54px; height: 54px; border-radius: 50%; background: var(--miel); color: var(--cacao); display: grid; place-items: center; font-family: var(--font-display); font-size: 26px; letter-spacing: 0.02em; flex-shrink: 0; box-shadow: inset 0 0 0 3px var(--caramelo); }
+  .cc-brand-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--masthead-muted); margin: 0 0 2px; }
+  .cc-title { font-family: var(--font-display); font-size: 40px; font-weight: 400; letter-spacing: 0.03em; line-height: 0.95; margin: 0; text-transform: uppercase; color: var(--masthead-text); }
+  .cc-header-meta { text-align: right; font-size: 13.5px; color: var(--masthead-muted); }
+  .cc-header-meta div + div { margin-top: 2px; }
+  .cc-header-meta code { color: var(--masthead-text); opacity: 0.85; font-family: ui-monospace, monospace; }
+
+  .cc-tablist { display: flex; gap: 2px; border-bottom: 1px solid var(--border-strong); margin-bottom: 30px; overflow-x: auto; }
+  .cc-tab { appearance: none; border: none; background: none; cursor: pointer; font-family: var(--font-display); font-size: 20px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 14px 16px 10px; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .cc-tab:hover { color: var(--text-primary); }
+  .cc-tab[aria-selected="true"] { color: var(--text-primary); border-bottom-color: var(--caramelo); }
+  .cc-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .cc-panel[hidden] { display: none; }
+
+  .cc-section { margin-top: 36px; }
+  .cc-section:first-child { margin-top: 0; }
+  .cc-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .cc-section-title { font-family: var(--font-display); font-size: 28px; font-weight: 400; letter-spacing: 0.03em; text-transform: uppercase; line-height: 1; margin: 0; }
+  .cc-section-sub { font-size: 14.5px; color: var(--text-secondary); margin: 5px 0 0; max-width: 70ch; }
+  .cc-section-sub strong { font-weight: 700; }
+
+  .cc-kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .cc-kpi { background: var(--surface); padding: 16px 18px; min-width: 0; }
+  .cc-kpi-label { font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .cc-kpi-value { font-family: var(--font-display); font-size: 36px; letter-spacing: 0.02em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cc-kpi-sub { font-size: 13.5px; color: var(--text-secondary); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .cc-kpi.is-accent { background: var(--accent-soft); }
+  .cc-kpi.is-accent .cc-kpi-value { color: var(--accent-ink); }
+  .cc-kpi-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .cc-kpi-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 900px) { .cc-kpi-grid, .cc-kpi-grid.cols-4 { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 620px) { .cc-kpi-grid, .cc-kpi-grid.cols-3, .cc-kpi-grid.cols-4 { grid-template-columns: repeat(2, 1fr); } }
+
+  .cc-callout { background: var(--accent-soft); border: 1px solid var(--accent-soft-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap; }
+  .cc-callout-figure { font-family: var(--font-display); font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--accent-ink); }
+  .cc-callout-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--accent-ink); opacity: 0.8; display: block; margin-bottom: 4px; }
+  .cc-callout-note { font-size: 14px; color: var(--text-secondary); max-width: 60ch; }
+
+  .cc-table-wrap { overflow: visible; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 1px 2px rgba(46,27,14,.05), 0 12px 32px -18px rgba(46,27,14,.35); }
+  table.cc-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  table.cc-table th { text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 10px 9px; border-bottom: 1px solid var(--border-strong); white-space: normal; line-height: 1.2; vertical-align: bottom; background: var(--surface); }
+  table.cc-table th:first-child { border-top-left-radius: 14px; }
+  table.cc-table th:last-child { border-top-right-radius: 14px; }
+  table.cc-table td { padding: 9px 9px; border-bottom: 1px solid var(--gridline); vertical-align: top; }
+  table.cc-table tr:last-child td { border-bottom: none; }
+  table.cc-table td.num, table.cc-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.cc-table td.num { white-space: nowrap; }
+  table.cc-table td.center, table.cc-table th.center { text-align: center; }
+  table.cc-table tbody tr:hover td { background: var(--surface-2); }
+  table.cc-table tr.is-highlight td { background: var(--accent-soft); }
+  table.cc-table tr.is-highlight td:first-child { box-shadow: inset 3px 0 0 var(--caramelo); }
+  table.cc-table tr.is-group td { background: var(--surface-2); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-ink); }
+  table.cc-table td.wrap { white-space: normal; max-width: 42ch; }
+  table.cc-table--compact { font-size: 13.5px; }
+  table.cc-table--fixed { table-layout: fixed; }
+  table.cc-table--fixed td.num { white-space: normal; }
+  table.cc-table--compact th { padding: 8px 6px; font-size: 11px; }
+  table.cc-table--compact td { padding: 7px 6px; }
+  table.cc-table td .cc-sub { display: block; font-size: 12px; color: var(--muted); font-weight: 400; white-space: normal; max-width: 100%; }
+  .cc-mini-note { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+
+  .cc-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 9px; border-radius: 7px; line-height: 1.3; background: var(--chip-bg); color: var(--chip-text); }
+  .cc-badge { display: inline-block; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 100px; border: 1px solid; white-space: nowrap; }
+  .cc-badge-good { background: color-mix(in srgb, var(--good) 14%, var(--surface)); color: var(--good-text); border-color: var(--good); }
+  .cc-badge-warn { background: color-mix(in srgb, var(--warning) 18%, var(--surface)); color: var(--warning-text); border-color: var(--warning); }
+  .cc-badge-crit { background: color-mix(in srgb, var(--critical) 14%, var(--surface)); color: var(--critical-text); border-color: var(--critical); }
+  .cc-badge-muted { background: var(--surface-2); color: var(--muted); border-color: var(--border-strong); }
+
+  .cc-alerts { display: flex; flex-direction: column; gap: 10px; }
+  .cc-alert { display: grid; grid-template-columns: 4px 1fr; gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .cc-alert-bar { background: var(--sev-color); }
+  .cc-alert-body { padding: 12px 16px 13px 0; }
+  .cc-alert-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+  .cc-alert-area { font-size: 13px; color: var(--muted); }
+  .cc-alert-desc { font-size: 15px; margin: 0 0 6px; }
+  .cc-alert-res { font-size: 13.5px; color: var(--text-secondary); }
+  .cc-alert-src { font-size: 12.5px; color: var(--muted); font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+  .cc-barchart { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px 14px; box-shadow: 0 1px 2px rgba(46,27,14,.05), 0 12px 32px -18px rgba(46,27,14,.35); }
+  .cc-bar-row { display: grid; grid-template-columns: 240px 1fr 92px; align-items: center; gap: 12px; padding: 8px 0; }
+  .cc-bar-row + .cc-bar-row { border-top: 1px solid var(--gridline); }
+  .cc-bar-label { font-size: 14.5px; font-weight: 600; }
+  .cc-bar-label small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+  .cc-bar-track { height: 12px; background: var(--surface-2); border-radius: 6px; overflow: hidden; position: relative; }
+  .cc-bar-fill { height: 100%; border-radius: 6px; }
+  .cc-bar-fill.is-2 { position: absolute; top: 0; left: 0; opacity: 0.55; }
+  .cc-bar-value { font-size: 14.5px; font-variant-numeric: tabular-nums; text-align: right; color: var(--text-secondary); }
+  .cc-bar-marker { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--critical); }
+  @media (max-width: 700px) { .cc-bar-row { grid-template-columns: 120px 1fr 70px; } }
+  .cc-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13.5px; color: var(--text-secondary); margin-top: 12px; }
+  .cc-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+  .cc-legend-swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  .cc-product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+  .cc-product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .cc-product-name { font-weight: 700; font-size: 16.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .cc-product-row { display: flex; justify-content: space-between; font-size: 14.5px; padding: 5px 0; border-top: 1px solid var(--gridline); gap: 10px; }
+  .cc-product-row:first-of-type { border-top: none; }
+  .cc-product-row .k { color: var(--text-secondary); }
+  .cc-product-row .v { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+
+  .cc-details { margin-top: 10px; }
+  .cc-details > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--accent-ink); list-style: none; display: inline-flex; align-items: center; gap: 5px; user-select: none; }
+  .cc-details > summary::-webkit-details-marker { display: none; }
+  .cc-details > summary::before { content: '▸'; font-size: 10px; color: var(--accent); transition: transform .15s ease; display: inline-block; }
+  .cc-details[open] > summary::before { transform: rotate(90deg); }
+  .cc-details-body { margin-top: 8px; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
+  .cc-details-body .cc-table-wrap { background: var(--surface); }
+
+  .cc-sim { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 12px; padding: 22px 24px; }
+  .cc-sim-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--gridline); }
+  @media (max-width: 760px) { .cc-sim-controls { grid-template-columns: 1fr; } }
+  .cc-sim-field label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .cc-sim-slider { width: 100%; appearance: none; height: 6px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--border); outline: none; }
+  .cc-sim-slider::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); border: 3px solid var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.28); cursor: pointer; }
+  .cc-sim-slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); border: 3px solid var(--surface); cursor: pointer; }
+  .cc-sim-readout { font-family: var(--font-display); font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--accent-ink); margin-bottom: 6px; }
+  .cc-sim-readout-sub { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .cc-seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+  .cc-seg button { appearance: none; border: none; background: var(--surface); color: var(--text-secondary); font-family: var(--font-body); font-size: 14px; font-weight: 600; padding: 9px 14px; cursor: pointer; border-right: 1px solid var(--border); }
+  .cc-seg button:last-child { border-right: none; }
+  .cc-seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+  .cc-cascade-row { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--gridline); font-size: 15px; }
+  .cc-cascade-row .k { color: var(--text-secondary); }
+  .cc-cascade-row .v { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .cc-cascade-row.is-total { border-top: 2px solid var(--border-strong); border-bottom: none; margin-top: 6px; padding-top: 14px; font-size: 18px; }
+  .cc-cascade-row.is-total .v { font-family: var(--font-display); font-size: 30px; font-weight: 400; }
+  .cc-sim-verdict { margin-top: 16px; padding: 13px 16px; border-radius: 9px; font-size: 14.5px; line-height: 1.55; border: 1px solid; }
+  .cc-sim-verdict.is-good { background: color-mix(in srgb, var(--good) 12%, var(--surface)); border-color: var(--good); color: var(--good-text); }
+  .cc-sim-verdict.is-bad { background: color-mix(in srgb, var(--critical) 12%, var(--surface)); border-color: var(--critical); color: var(--critical-text); }
+  .cc-sim-verdict.is-warn { background: color-mix(in srgb, var(--warning) 14%, var(--surface)); border-color: var(--warning); color: var(--warning-text); }
+  .cc-sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 760px) { .cc-sim-grid { grid-template-columns: 1fr; } }
+
+  .cc-stepper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .cc-step { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; text-align: center; }
+  .cc-step-name { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+  .cc-step-ctl { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .cc-step-ctl button { appearance: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface); color: var(--accent); font-size: 18px; font-weight: 700; cursor: pointer; line-height: 1; }
+  .cc-step-ctl button:hover { background: var(--accent); color: var(--surface); }
+  .cc-step-n { font-family: var(--font-display); font-size: 28px; min-width: 28px; }
+  .cc-step-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+  @media (max-width: 620px) { .cc-stepper { grid-template-columns: repeat(2, 1fr); } }
+  .cc-split { display: flex; height: 26px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .cc-split > div { display: grid; place-items: center; font-size: 12.5px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; }
+
+  .cc-print-btn { appearance: none; cursor: pointer; font-family: var(--font-display); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cacao); background: var(--miel); border: none; border-radius: 999px; padding: 8px 18px 7px; margin-bottom: 10px; }
+  .cc-print-btn:hover { background: #FFFFFF; }
+  @media print {
+    .cc-tablist, .cc-print-btn { display: none !important; }
+    .cc-panel[hidden] { display: none !important; }
+    .cc-shell { max-width: none; padding: 0; margin: 0; }
+    .cc-masthead::after { display: none; }
+    .cc-section + .cc-section { page-break-before: always; }
+    .cc-section { page-break-inside: avoid; }
+    table.cc-table { font-size: 10.5px; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @page { size: A4 landscape; margin: 12mm; }
+</style>
+</head>
+<body>
+<div class="cc-masthead">
+  <header class="cc-header">
+    <div class="cc-header-brand">
+      <div class="cc-logo" aria-hidden="true">MP</div>
+      <div>
+        <p class="cc-brand-eyebrow">Mr. Peanutt · mantequillas</p>
+        <h1 class="cc-title">Centro de Costos</h1>
+      </div>
+    </div>
+    <div class="cc-header-meta">
+      <button type="button" id="cc-print-btn" class="cc-print-btn">Imprimir / Exportar PDF</button>
+      <div id="cc-generated"></div>
+      <div>Fuente: <code>DATOS INICIALES/</code> → <code>BD/mrpeanutt_costos.db</code></div>
+    </div>
+  </header>
+</div>
+<div class="cc-shell">
+
+  <nav class="cc-tablist" role="tablist" aria-label="Secciones del centro de costos">
+    <button class="cc-tab" role="tab" data-tab="resumen" aria-selected="true">Resumen</button>
+    <button class="cc-tab" role="tab" data-tab="productos">Productos y costos</button>
+    <button class="cc-tab" role="tab" data-tab="directo">Canal directo</button>
+    <button class="cc-tab" role="tab" data-tab="tiendas">Tiendas (B2B)</button>
+    <button class="cc-tab" role="tab" data-tab="restaurantes">Restaurantes (baldes)</button>
+    <button class="cc-tab" role="tab" data-tab="equilibrio">Punto de equilibrio</button>
+    <button class="cc-tab" role="tab" data-tab="hallazgos">Hallazgos</button>
+  </nav>
+
+  <!-- ====================== RESUMEN ====================== -->
+  <section class="cc-panel" id="panel-resumen" role="tabpanel">
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Indicadores principales</h2>
+        <p class="cc-section-sub">Márgenes de Mr. Peanutt por canal, lo que gana la tienda al revender y el piso de venta que cubre los costos fijos.</p></div>
+      </div>
+      <div class="cc-kpi-grid" id="cc-res-kpis"></div>
+    </div>
+
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">¿Cuánto gana la tienda?</h2>
+        <p class="cc-section-sub">Margen de la tienda al revender al PVP sugerido, comprando en cada tramo. <strong>Excel</strong> = escala actual; <strong>Propuesta</strong> = escala corregida (tramos sin huecos, precios redondeados). El PVP lo fija el canal directo: maní S/23, almendra S/25.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-res-tienda"></div>
+      <p class="cc-mini-note">El tramo se define por el total del pedido sumando maní + almendra, y el descuento del tramo se aplica a los dos productos. Por B2B solo se venden estos dos; chocomaní y crunchy van únicamente por canal directo.</p>
+    </div>
+
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Margen de Mr. Peanutt por canal</h2>
+        <p class="cc-section-sub">Margen bruto sobre el precio sin IGV. La línea roja es el margen más bajo de toda la escala, que se usa para el punto de equilibrio conservador.</p></div>
+      </div>
+      <div class="cc-barchart" id="cc-res-barras"></div>
+    </div>
+
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Alertas pendientes</h2>
+        <p class="cc-section-sub">Hallazgos del Excel que todavía necesitan una decisión tuya. El detalle completo está en la pestaña Hallazgos.</p></div>
+      </div>
+      <div class="cc-alerts" id="cc-res-alertas"></div>
+    </div>
+  </section>
+
+  <!-- ====================== PRODUCTOS ====================== -->
+  <section class="cc-panel" id="panel-productos" role="tabpanel" hidden>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Costeo por presentación</h2>
+        <p class="cc-section-sub">Costo unitario del Excel y costo por kilo. El desglose insumo / envase es una estimación: mantequilla a S/10/kg y almendras a S/40/kg, el resto es envase, etiqueta y mano de obra.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-prod-tabla"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Cómo se arma el costo del balde</h2>
+        <p class="cc-section-sub">El de 4 kg viene completo del Excel. El de 1 kg solo traía el envase (S/3.00): se propone el costeo completo con la misma etiqueta.</p></div>
+      </div>
+      <div class="cc-product-grid" id="cc-prod-baldes"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Parámetros</h2>
+        <p class="cc-section-sub">Insumos que vienen del Excel y parámetros de la propuesta. Se cambian en <code>scripts/etl_build_db.py</code> y se vuelve a correr la cadena.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-prod-params"></div>
+    </div>
+  </section>
+
+  <!-- ====================== CANAL DIRECTO ====================== -->
+  <section class="cc-panel" id="panel-directo" role="tabpanel" hidden>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Precios al público y margen</h2>
+        <p class="cc-section-sub">El canal directo está en <strong>NRUS: no cobra IGV</strong>, así que el PVP es precio neto y el margen del Excel es el margen real. El PVP redondeado (S/0.50) es el que se comunica y el que fija el precio de mercado: las tiendas revenden a ese mismo precio.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-dir-tabla"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Promoción recomendada: "Arma tu pack"</h2>
+        <p class="cc-section-sub">Precio fijo por cantidad, el cliente elige los sabores del catálogo. Es la mecánica más adecuada para motivar el combo frente a la compra por unidad: un solo mensaje, sin porcentajes, y la almendra como "upgrade" que no cuesta más.</p></div>
+      </div>
+      <div class="cc-kpi-grid" id="cc-packs-kpis"></div>
+      <div class="cc-table-wrap" id="cc-dir-packs" style="margin-top:14px"></div>
+      <p class="cc-mini-note">Descuento y margen se calculan sobre <strong>todas las mezclas posibles</strong> de cada pack (con la regla de máximo 1 almendra). "Peor mezcla" = la que deja menos margen a Mr. Peanutt; aun así ningún pack baja del 50%.</p>
+      <details class="cc-details"><summary>Ver todas las mezclas posibles de cada pack</summary>
+        <div class="cc-details-body"><div class="cc-table-wrap" id="cc-dir-packs-mezclas"></div></div>
+      </details>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Juega con el margen de los packs</h2>
+        <p class="cc-section-sub">Mueve el margen objetivo (sobre la <strong>peor mezcla</strong> posible de cada pack) y ves el precio que sale, el ahorro que percibe el cliente y si el precio por frasco sigue por encima de lo que paga la tienda (maní S/<span id="pk-tienda"></span>). Los packs mixtos van al 55%; los de solo almendra están fijados en S/46 y S/66 (~50%) porque al 55% casi no tendrían descuento. La fila resaltada es la propuesta vigente.</p></div>
+      </div>
+      <div class="cc-sim">
+        <div class="cc-sim-controls" style="grid-template-columns: 1fr">
+          <div class="cc-sim-field">
+            <label>Margen objetivo de Mr. Peanutt (peor mezcla) <span id="pk-m-txt"></span></label>
+            <input type="range" class="cc-sim-slider" id="pk-m" min="40" max="72" step="1" value="55">
+          </div>
+        </div>
+        <div class="cc-kpi-grid cols-3" id="pk-cards"></div>
+        <div class="cc-sim-verdict" id="pk-verdict" style="margin-top:14px"></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-dir-packs-esc" style="margin-top:14px"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Términos de la promoción</h2>
+        <p class="cc-section-sub">Las reglas que hacen que el pack sea atractivo para el cliente y seguro para el margen. Cada término lleva su porqué.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-dir-terminos"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Armador de promociones</h2>
+        <p class="cc-section-sub">Para probar packs nuevos: arma cualquier combinación de frascos y mueve el descuento. Ves el precio sugerido, el margen, cuánto ganas frente a venderlos sueltos y cómo quedaría esa mezcla con el precio fijo del pack propuesto.</p></div>
+      </div>
+      <div class="cc-sim">
+        <div class="cc-sim-controls">
+          <div class="cc-sim-field" style="grid-column: 1 / -1"><label>Frascos en el combo</label><div class="cc-stepper" id="promo-stepper"></div></div>
+          <div class="cc-sim-field">
+            <label>Descuento sobre los sueltos <span id="promo-dto-txt"></span></label>
+            <input type="range" class="cc-sim-slider" id="promo-dto" min="0" max="30" step="0.5" value="10">
+          </div>
+          <div class="cc-sim-field">
+            <label>Precio del combo</label>
+            <div class="cc-sim-readout" id="promo-precio"></div>
+            <div class="cc-sim-readout-sub" id="promo-precio-sub"></div>
+          </div>
+        </div>
+        <div class="cc-sim-grid">
+          <div>
+            <div class="cc-sim-readout" id="promo-margen"></div>
+            <div class="cc-sim-readout-sub">margen del combo (sin IGV)</div>
+            <div style="margin-top:16px" id="promo-split"></div>
+            <div class="cc-legend"><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s1)"></i>Costo</span><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s2)"></i>Ganancia</span><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s4)"></i>Descuento cedido</span></div>
+          </div>
+          <div>
+            <div id="promo-cascada"></div>
+            <div class="cc-sim-verdict" id="promo-verdict"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Promociones que traía el Excel</h2>
+        <p class="cc-section-sub">Precio que sale del margen puesto en el Excel, comparado con la suma de los productos sueltos al PVP. Las tres quedan reemplazadas por las propuestas de arriba.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-dir-promos"></div>
+    </div>
+  </section>
+
+  <!-- ====================== TIENDAS ====================== -->
+  <section class="cc-panel" id="panel-tiendas" role="tabpanel" hidden>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Escala propuesta para tiendas</h2>
+        <p class="cc-section-sub">Solo maní y almendra. El tramo se gana con el <strong>total del pedido con IGV</strong> (sumando ambos productos) y aplica a los dos. Precio con IGV redondeado a S/0.10. El semáforo marca si la tienda gana al menos 30% al PVP sugerido.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-tie-propuesta"></div>
+      <details class="cc-details"><summary>Ver la escala tal como está en el Excel (as-is)</summary>
+        <div class="cc-details-body">
+          <div class="cc-table-wrap" id="cc-tie-excel"></div>
+          <p class="cc-mini-note">Con el PVP actual (maní S/23, almendra S/25). Umbrales con el texto original del Excel; unidades mínimas calculadas con el precio con IGV.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Quién gana qué en cada eslabón</h2>
+        <p class="cc-section-sub">Reparto de la contribución (ingreso neto − costo) según quién vende. Mr. Peanutt directo no paga IGV (NRUS); la tienda sí, por eso su ingreso neto es PVP ÷ 1.18. Los tramos Distribuidor y Exclusivo existen para quien revende a tiendas: tienen que dejarle ~25% al distribuidor y seguir dejándole 30%+ a la tienda.</p></div>
+      </div>
+      <div id="cc-tie-cadena"></div>
+    </div>
+
+  </section>
+
+  <!-- ====================== RESTAURANTES ====================== -->
+  <section class="cc-panel" id="panel-restaurantes" role="tabpanel" hidden>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Escala propuesta para baldes</h2>
+        <p class="cc-section-sub">Tramos por <strong>cantidad de baldes por pedido</strong> (más fácil de comunicar que "compras mayores a S/400"). Márgenes iguales al Excel, precio con IGV redondeado a S/1. El balde de 1 kg usa el costeo propuesto.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-res-baldes"></div>
+      <details class="cc-details"><summary>Ver la escala del balde de 4 kg tal como está en el Excel (as-is)</summary>
+        <div class="cc-details-body"><div class="cc-table-wrap" id="cc-res-baldes-excel"></div></div>
+      </details>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Lo que le cuesta al restaurante cada porción</h2>
+        <p class="cc-section-sub">El restaurante no revende el frasco: usa la mantequilla como insumo. Lo que le importa es el costo por kilo y por porción de 30 g, comparado con comprar frascos.</p></div>
+      </div>
+      <div class="cc-barchart" id="cc-res-kg"></div>
+      <div class="cc-table-wrap" id="cc-res-porcion" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- ====================== PUNTO DE EQUILIBRIO ====================== -->
+  <section class="cc-panel" id="panel-equilibrio" role="tabpanel" hidden>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Costos fijos mensuales</h2>
+        <p class="cc-section-sub">La empresa no tiene más costos fijos que estos tres. La cuota del NRUS se toma en su tope (S/50) por seguridad; el Cloud (USD 20) se convierte a soles al tipo de cambio del BCRP.</p></div>
+      </div>
+      <div class="cc-kpi-grid cols-3" id="cc-pe-kpis"></div>
+      <div class="cc-table-wrap" id="cc-pe-costos" style="margin-top:14px"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Punto de equilibrio por escenario</h2>
+        <p class="cc-section-sub">Venta mensual que cubre los costos fijos si TODO se vendiera por ese canal y tramo. El <strong>conservador</strong> usa el margen más bajo de toda la escala (hoy: almendra Exclusivo): cualquier mezcla real necesita vender menos que eso. En el canal directo no hay IGV, así que "sin IGV" y "con IGV" coinciden.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-pe-tabla"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Simulador de equilibrio</h2>
+        <p class="cc-section-sub">Cambia los costos fijos (por ejemplo, si agregas delivery o pauta) y el escenario de venta.</p></div>
+      </div>
+      <div class="cc-sim">
+        <div class="cc-sim-controls">
+          <div class="cc-sim-field">
+            <label>Costos fijos mensuales <span id="pe-cf-txt"></span></label>
+            <input type="range" class="cc-sim-slider" id="pe-cf" min="0" max="8000" step="10">
+          </div>
+          <div class="cc-sim-field"><label>Escenario de venta</label><div class="cc-seg" id="pe-esc"></div></div>
+        </div>
+        <div class="cc-sim-grid">
+          <div>
+            <div class="cc-sim-readout" id="pe-out-venta"></div>
+            <div class="cc-sim-readout-sub">venta mensual con IGV para cubrir los costos fijos</div>
+          </div>
+          <div id="pe-cascada"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== HALLAZGOS ====================== -->
+  <section class="cc-panel" id="panel-hallazgos" role="tabpanel" hidden>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Recomendaciones</h2>
+        <p class="cc-section-sub">Decisiones sugeridas, en orden de prioridad.</p></div>
+      </div>
+      <div class="cc-table-wrap" id="cc-hal-reco"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Historial de hallazgos</h2>
+        <p class="cc-section-sub">Todo lo que se encontró en el Excel, su severidad, estado y cómo se resolvió o mitigó en este centro de costos.</p></div>
+      </div>
+      <div class="cc-alerts" id="cc-hal-issues"></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  const DATA = {"parametros": [{"id": 1, "clave": "igv", "descripcion": "IGV", "valor": 0.18, "unidad": "%", "fuente": "Ley", "nota": "Todos los precios B2B se cotizan sin IGV y se muestran con IGV"}, {"id": 2, "clave": "costo_mantequilla_kg", "descripcion": "Costo de la mantequilla de maní a granel", "valor": 10.0, "unidad": "S/ por kg", "fuente": "H8", "nota": ""}, {"id": 3, "clave": "costo_almendra_kg", "descripcion": "Costo de almendras", "valor": 40.0, "unidad": "S/ por kg", "fuente": "H7", "nota": ""}, {"id": 4, "clave": "ref_I7", "descripcion": "Celda I7 (=H7/5) sin uso en las fórmulas", "valor": 8.0, "unidad": "S/", "fuente": "I7", "nota": "Referencia suelta; ver issues"}, {"id": 5, "clave": "ref_J7", "descripcion": "Celda J7 sin uso en las fórmulas", "valor": 10.2, "unidad": "S/", "fuente": "J7", "nota": "Referencia suelta; ver issues"}, {"id": 6, "clave": "balde4_envase", "descripcion": "Envase balde 4 kg", "valor": 5.19, "unidad": "S/ por unidad", "fuente": "C16", "nota": ""}, {"id": 7, "clave": "balde1_envase", "descripcion": "Envase balde 1 kg", "valor": 3.0, "unidad": "S/ por unidad", "fuente": "F16", "nota": ""}, {"id": 8, "clave": "balde_etiqueta", "descripcion": "Etiqueta del balde", "valor": 1.7, "unidad": "S/ por unidad", "fuente": "C18", "nota": "Asumida igual para el balde de 1 kg (A4)"}, {"id": 9, "clave": "canal_directo_igv", "descripcion": "IGV en el canal directo (NRUS: no se cobra)", "valor": 0.0, "unidad": "%", "fuente": "Decisión 2026-09-18", "nota": "El PVP es precio neto"}, {"id": 10, "clave": "margen_promo_minimo", "descripcion": "Margen mínimo de cualquier promoción del canal directo", "valor": 0.5, "unidad": "%", "fuente": "Propuesta", "nota": ""}, {"id": 11, "clave": "porcion_gr", "descripcion": "Porción de referencia para restaurantes", "valor": 30.0, "unidad": "gramos", "fuente": "Propuesta", "nota": "Untado de un sándwich / crepe"}, {"id": 12, "clave": "tipo_cambio_usd_pen", "descripcion": "Tipo de cambio USD -> PEN (para el Cloud)", "valor": 3.38, "unidad": "S/ por USD", "fuente": "BCRP 15-sep-2026", "nota": "Mismo que Suplevet"}, {"id": 13, "clave": "margen_tienda_minimo", "descripcion": "Margen mínimo sano para la tienda al PVP", "valor": 0.3, "unidad": "%", "fuente": "Propuesta", "nota": "Referencia retail 30-40%"}], "productos_costeo": [{"id": 1, "clave": "mani", "producto": "Mantequilla de mani 150gr", "familia": "FRASCO", "presentacion": "Frasco 150 g", "peso_kg": 0.15, "costo_unitario": 5.8, "costo_por_kg": 38.666666666666664, "costo_insumo_principal_est": 1.5, "costo_envase_y_otros_est": 4.3, "estado": "Excel", "fuente": "Hoja 1!C3"}, {"id": 2, "clave": "almendra", "producto": "Mantequilla Almendra 150gr", "familia": "FRASCO", "presentacion": "Frasco 150 g", "peso_kg": 0.15, "costo_unitario": 11.0, "costo_por_kg": 73.33333333333334, "costo_insumo_principal_est": 6.0, "costo_envase_y_otros_est": 5.0, "estado": "Excel", "fuente": "Hoja 1!C4"}, {"id": 3, "clave": "chocomani", "producto": "Mantequilla de Chocomaní 150gr", "familia": "FRASCO", "presentacion": "Frasco 150 g", "peso_kg": 0.15, "costo_unitario": 5.9, "costo_por_kg": 39.333333333333336, "costo_insumo_principal_est": 1.5, "costo_envase_y_otros_est": 4.4, "estado": "Excel", "fuente": "Hoja 1!C5"}, {"id": 4, "clave": "crunchy", "producto": "Mantequilla Crunchi 150gr", "familia": "FRASCO", "presentacion": "Frasco 150 g", "peso_kg": 0.15, "costo_unitario": 5.9, "costo_por_kg": 39.333333333333336, "costo_insumo_principal_est": 1.5, "costo_envase_y_otros_est": 4.4, "estado": "Excel", "fuente": "Hoja 1!C6"}, {"id": 5, "clave": "balde4", "producto": "Mr. Peanutt Balde 4 kg", "familia": "BALDE", "presentacion": "Balde 4 kg", "peso_kg": 4.0, "costo_unitario": 46.89, "costo_por_kg": 11.72, "costo_insumo_principal_est": 40.0, "costo_envase_y_otros_est": 6.89, "estado": "Excel", "fuente": "Hoja 1!C16:C19"}, {"id": 6, "clave": "balde1", "producto": "Mr. Peanutt Balde 1 kg", "familia": "BALDE", "presentacion": "Balde 1 kg", "peso_kg": 1.0, "costo_unitario": 14.7, "costo_por_kg": 14.7, "costo_insumo_principal_est": 10.0, "costo_envase_y_otros_est": 4.7, "estado": "Propuesto (A4)", "fuente": "Hoja 1!F16 + supuesto"}], "costeo_balde_detalle": [{"id": 1, "producto": "Balde 4 kg", "componente": "Envase (balde)", "cantidad": 1.0, "unidad": "unidad", "costo_unitario": 5.19, "costo_total": 5.19, "estado": "Excel", "fuente": "C16"}, {"id": 2, "producto": "Balde 4 kg", "componente": "Mantequilla de maní", "cantidad": 4.0, "unidad": "kg", "costo_unitario": 10.0, "costo_total": 40.0, "estado": "Excel", "fuente": "C17 (=4*10)"}, {"id": 3, "producto": "Balde 4 kg", "componente": "Etiqueta", "cantidad": 1.0, "unidad": "unidad", "costo_unitario": 1.7, "costo_total": 1.7, "estado": "Excel", "fuente": "C18"}, {"id": 4, "producto": "Balde 4 kg", "componente": "COSTO TOTAL", "cantidad": null, "unidad": null, "costo_unitario": null, "costo_total": 46.89, "estado": "Excel", "fuente": "C19"}, {"id": 5, "producto": "Balde 1 kg", "componente": "Envase (balde)", "cantidad": 1.0, "unidad": "unidad", "costo_unitario": 3.0, "costo_total": 3.0, "estado": "Excel", "fuente": "F16"}, {"id": 6, "producto": "Balde 1 kg", "componente": "Mantequilla de maní", "cantidad": 1.0, "unidad": "kg", "costo_unitario": 10.0, "costo_total": 10.0, "estado": "Propuesto", "fuente": "H8 x 1 kg"}, {"id": 7, "producto": "Balde 1 kg", "componente": "Etiqueta", "cantidad": 1.0, "unidad": "unidad", "costo_unitario": 1.7, "costo_total": 1.7, "estado": "Propuesto (A4)", "fuente": "misma etiqueta C18"}, {"id": 8, "producto": "Balde 1 kg", "componente": "COSTO TOTAL", "cantidad": null, "unidad": null, "costo_unitario": null, "costo_total": 14.7, "estado": "Propuesto", "fuente": "suma"}], "canal_directo": [{"id": 1, "clave": "mani", "producto": "Mantequilla de mani 150gr", "costo": 5.8, "margen_excel_pct": 0.748, "precio_lista": 23.02, "pvp_redondeado": 23.0, "margen_pct": 0.7478, "ganancia_unit": 17.2, "precio_por_kg": 153.33, "fuente": "Hoja 1!C3:E3"}, {"id": 2, "clave": "almendra", "producto": "Mantequilla Almendra 150gr", "costo": 11.0, "margen_excel_pct": 0.56, "precio_lista": 25.0, "pvp_redondeado": 25.0, "margen_pct": 0.56, "ganancia_unit": 14.0, "precio_por_kg": 166.67, "fuente": "Hoja 1!C4:E4"}, {"id": 3, "clave": "chocomani", "producto": "Mantequilla de Chocomaní 150gr", "costo": 5.9, "margen_excel_pct": 0.748, "precio_lista": 23.41, "pvp_redondeado": 23.5, "margen_pct": 0.7489, "ganancia_unit": 17.6, "precio_por_kg": 156.67, "fuente": "Hoja 1!C5:E5"}, {"id": 4, "clave": "crunchy", "producto": "Mantequilla Crunchi 150gr", "costo": 5.9, "margen_excel_pct": 0.748, "precio_lista": 23.41, "pvp_redondeado": 23.5, "margen_pct": 0.7489, "ganancia_unit": 17.6, "precio_por_kg": 156.67, "fuente": "Hoja 1!C6:E6"}], "promociones": [{"id": 1, "promocion": "Promoción 2 mantequillas de almendra", "canal": "Directo", "composicion": "2 x Almendra 150 g", "costo": 22.0, "margen_excel_pct": 0.612, "precio_excel": 56.7, "suma_precios_individuales": 50.0, "descuento_vs_individual_pct": -0.134, "ganancia_unit": 34.7, "observacion": "Sale MÁS CARA que comprar 2 frascos sueltos: el margen 61.2% está mal puesto (no es promoción). Reemplazo propuesto: Pack almendra x2 a S/46 (mecánica arma tu pack).", "fuente": "Hoja 1!B9:E9"}, {"id": 2, "promocion": "Promoción 3 mantequillas de almendra", "canal": "Directo", "composicion": "3 x Almendra 150 g", "costo": 33.0, "margen_excel_pct": 0.2325, "precio_excel": 43.0, "suma_precios_individuales": 75.0, "descuento_vs_individual_pct": 0.4267, "ganancia_unit": 10.0, "observacion": "Margen 23%: regala casi toda la ganancia (43% de descuento). Reemplazo propuesto: Pack almendra x3 a S/66.", "fuente": "Hoja 1!B10:E10"}, {"id": 3, "promocion": "Combo 3 mantequillas (máx. 1 almendra)", "canal": "Excel: bajo CANAL B2B", "composicion": "Maní 150 g + Chocomaní 150 g + Almendra 150 g", "costo": 22.7, "margen_excel_pct": 0.43, "precio_excel": 39.82, "suma_precios_individuales": 71.5, "descuento_vs_individual_pct": 0.443, "ganancia_unit": 17.12, "observacion": "Para el canal directo es un 44% de descuento sobre los sueltos (S/71.50): demasiado. Reemplazo propuesto: Pack 3 a S/51 con máx. 1 almendra (margen 55-66%).", "fuente": "Hoja 1!L14:O19"}], "promociones_propuesta": [{"id": 1, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "precio_por_frasco": 21.0, "regla": "Elige del catálogo; máx. 1 almendra; se puede repetir sabor", "combos_posibles": 9, "costo_min": 11.6, "costo_max": 16.9, "sueltos_min": 46.0, "sueltos_max": 48.5, "descuento_min_pct": 0.087, "descuento_max_pct": 0.134, "ahorro_min": 4.0, "ahorro_max": 6.5, "margen_min_pct": 0.5976, "margen_max_pct": 0.7238, "mezcla_peor_margen": "Chocomaní + Almendra", "mezcla_mayor_descuento": "Chocomaní + Almendra", "ganancia_min": 25.1, "ganancia_max": 30.4, "cumple_minimo": 1, "ejemplo": "Maní + Chocomaní", "ejemplo_sueltos": 46.5, "ejemplo_ahorro": 4.5, "ejemplo_margen_pct": 0.7214}, {"id": 2, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "precio_por_frasco": 17.0, "regla": "Elige del catálogo; máx. 1 almendra; se puede repetir sabor", "combos_posibles": 16, "costo_min": 17.4, "costo_max": 22.8, "sueltos_min": 69.0, "sueltos_max": 72.0, "descuento_min_pct": 0.2609, "descuento_max_pct": 0.2917, "ahorro_min": 18.0, "ahorro_max": 21.0, "margen_min_pct": 0.5529, "margen_max_pct": 0.6588, "mezcla_peor_margen": "2 Chocomaní + Almendra", "mezcla_mayor_descuento": "2 Chocomaní + Almendra", "ganancia_min": 28.2, "ganancia_max": 33.6, "cumple_minimo": 1, "ejemplo": "Maní + Chocomaní + Almendra", "ejemplo_sueltos": 71.5, "ejemplo_ahorro": 20.5, "ejemplo_margen_pct": 0.5549}, {"id": 3, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "precio_por_frasco": 16.0, "regla": "Elige del catálogo; máx. 1 almendra; se puede repetir sabor", "combos_posibles": 25, "costo_min": 23.2, "costo_max": 28.7, "sueltos_min": 92.0, "sueltos_max": 95.5, "descuento_min_pct": 0.3043, "descuento_max_pct": 0.3298, "ahorro_min": 28.0, "ahorro_max": 31.5, "margen_min_pct": 0.5516, "margen_max_pct": 0.6375, "mezcla_peor_margen": "3 Chocomaní + Almendra", "mezcla_mayor_descuento": "3 Chocomaní + Almendra", "ganancia_min": 35.3, "ganancia_max": 40.8, "cumple_minimo": 1, "ejemplo": "Maní + Chocomaní + Crunchy + Almendra", "ejemplo_sueltos": 95.0, "ejemplo_ahorro": 31.0, "ejemplo_margen_pct": 0.5531}, {"id": 4, "pack": "Pack almendra x2", "n_frascos": 2, "precio_pack": 46.0, "precio_por_frasco": 23.0, "regla": "Solo almendra", "combos_posibles": 1, "costo_min": 22.0, "costo_max": 22.0, "sueltos_min": 50.0, "sueltos_max": 50.0, "descuento_min_pct": 0.08, "descuento_max_pct": 0.08, "ahorro_min": 4.0, "ahorro_max": 4.0, "margen_min_pct": 0.5217, "margen_max_pct": 0.5217, "mezcla_peor_margen": "2 Almendra", "mezcla_mayor_descuento": "2 Almendra", "ganancia_min": 24.0, "ganancia_max": 24.0, "cumple_minimo": 1, "ejemplo": "2 Almendra", "ejemplo_sueltos": 50.0, "ejemplo_ahorro": 4.0, "ejemplo_margen_pct": 0.5217}, {"id": 5, "pack": "Pack almendra x3", "n_frascos": 3, "precio_pack": 66.0, "precio_por_frasco": 22.0, "regla": "Solo almendra", "combos_posibles": 1, "costo_min": 33.0, "costo_max": 33.0, "sueltos_min": 75.0, "sueltos_max": 75.0, "descuento_min_pct": 0.12, "descuento_max_pct": 0.12, "ahorro_min": 9.0, "ahorro_max": 9.0, "margen_min_pct": 0.5, "margen_max_pct": 0.5, "mezcla_peor_margen": "3 Almendra", "mezcla_mayor_descuento": "3 Almendra", "ganancia_min": 33.0, "ganancia_max": 33.0, "cumple_minimo": 1, "ejemplo": "3 Almendra", "ejemplo_sueltos": 75.0, "ejemplo_ahorro": 9.0, "ejemplo_margen_pct": 0.5}], "promociones_ejemplos": [{"id": 1, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "2 Maní", "n_almendra": 0, "costo": 11.6, "sueltos": 46.0, "descuento_pct": 0.087, "ahorro": 4.0, "margen_pct": 0.7238, "ganancia": 30.4, "ganancia_cedida": 4.0}, {"id": 2, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "Maní + Chocomaní", "n_almendra": 0, "costo": 11.7, "sueltos": 46.5, "descuento_pct": 0.0968, "ahorro": 4.5, "margen_pct": 0.7214, "ganancia": 30.3, "ganancia_cedida": 4.5}, {"id": 3, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "Maní + Crunchy", "n_almendra": 0, "costo": 11.7, "sueltos": 46.5, "descuento_pct": 0.0968, "ahorro": 4.5, "margen_pct": 0.7214, "ganancia": 30.3, "ganancia_cedida": 4.5}, {"id": 4, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "Maní + Almendra", "n_almendra": 1, "costo": 16.8, "sueltos": 48.0, "descuento_pct": 0.125, "ahorro": 6.0, "margen_pct": 0.6, "ganancia": 25.2, "ganancia_cedida": 6.0}, {"id": 5, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "2 Chocomaní", "n_almendra": 0, "costo": 11.8, "sueltos": 47.0, "descuento_pct": 0.1064, "ahorro": 5.0, "margen_pct": 0.719, "ganancia": 30.2, "ganancia_cedida": 5.0}, {"id": 6, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "Chocomaní + Crunchy", "n_almendra": 0, "costo": 11.8, "sueltos": 47.0, "descuento_pct": 0.1064, "ahorro": 5.0, "margen_pct": 0.719, "ganancia": 30.2, "ganancia_cedida": 5.0}, {"id": 7, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "Chocomaní + Almendra", "n_almendra": 1, "costo": 16.9, "sueltos": 48.5, "descuento_pct": 0.134, "ahorro": 6.5, "margen_pct": 0.5976, "ganancia": 25.1, "ganancia_cedida": 6.5}, {"id": 8, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "2 Crunchy", "n_almendra": 0, "costo": 11.8, "sueltos": 47.0, "descuento_pct": 0.1064, "ahorro": 5.0, "margen_pct": 0.719, "ganancia": 30.2, "ganancia_cedida": 5.0}, {"id": 9, "pack": "Pack 2", "n_frascos": 2, "precio_pack": 42.0, "mezcla": "Crunchy + Almendra", "n_almendra": 1, "costo": 16.9, "sueltos": 48.5, "descuento_pct": 0.134, "ahorro": 6.5, "margen_pct": 0.5976, "ganancia": 25.1, "ganancia_cedida": 6.5}, {"id": 10, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "3 Maní", "n_almendra": 0, "costo": 17.4, "sueltos": 69.0, "descuento_pct": 0.2609, "ahorro": 18.0, "margen_pct": 0.6588, "ganancia": 33.6, "ganancia_cedida": 18.0}, {"id": 11, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "2 Maní + Chocomaní", "n_almendra": 0, "costo": 17.5, "sueltos": 69.5, "descuento_pct": 0.2662, "ahorro": 18.5, "margen_pct": 0.6569, "ganancia": 33.5, "ganancia_cedida": 18.5}, {"id": 12, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "2 Maní + Crunchy", "n_almendra": 0, "costo": 17.5, "sueltos": 69.5, "descuento_pct": 0.2662, "ahorro": 18.5, "margen_pct": 0.6569, "ganancia": 33.5, "ganancia_cedida": 18.5}, {"id": 13, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "2 Maní + Almendra", "n_almendra": 1, "costo": 22.6, "sueltos": 71.0, "descuento_pct": 0.2817, "ahorro": 20.0, "margen_pct": 0.5569, "ganancia": 28.4, "ganancia_cedida": 20.0}, {"id": 14, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "Maní + 2 Chocomaní", "n_almendra": 0, "costo": 17.6, "sueltos": 70.0, "descuento_pct": 0.2714, "ahorro": 19.0, "margen_pct": 0.6549, "ganancia": 33.4, "ganancia_cedida": 19.0}, {"id": 15, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "Maní + Chocomaní + Crunchy", "n_almendra": 0, "costo": 17.6, "sueltos": 70.0, "descuento_pct": 0.2714, "ahorro": 19.0, "margen_pct": 0.6549, "ganancia": 33.4, "ganancia_cedida": 19.0}, {"id": 16, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "Maní + Chocomaní + Almendra", "n_almendra": 1, "costo": 22.7, "sueltos": 71.5, "descuento_pct": 0.2867, "ahorro": 20.5, "margen_pct": 0.5549, "ganancia": 28.3, "ganancia_cedida": 20.5}, {"id": 17, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "Maní + 2 Crunchy", "n_almendra": 0, "costo": 17.6, "sueltos": 70.0, "descuento_pct": 0.2714, "ahorro": 19.0, "margen_pct": 0.6549, "ganancia": 33.4, "ganancia_cedida": 19.0}, {"id": 18, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "Maní + Crunchy + Almendra", "n_almendra": 1, "costo": 22.7, "sueltos": 71.5, "descuento_pct": 0.2867, "ahorro": 20.5, "margen_pct": 0.5549, "ganancia": 28.3, "ganancia_cedida": 20.5}, {"id": 19, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "3 Chocomaní", "n_almendra": 0, "costo": 17.7, "sueltos": 70.5, "descuento_pct": 0.2766, "ahorro": 19.5, "margen_pct": 0.6529, "ganancia": 33.3, "ganancia_cedida": 19.5}, {"id": 20, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "2 Chocomaní + Crunchy", "n_almendra": 0, "costo": 17.7, "sueltos": 70.5, "descuento_pct": 0.2766, "ahorro": 19.5, "margen_pct": 0.6529, "ganancia": 33.3, "ganancia_cedida": 19.5}, {"id": 21, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "2 Chocomaní + Almendra", "n_almendra": 1, "costo": 22.8, "sueltos": 72.0, "descuento_pct": 0.2917, "ahorro": 21.0, "margen_pct": 0.5529, "ganancia": 28.2, "ganancia_cedida": 21.0}, {"id": 22, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "Chocomaní + 2 Crunchy", "n_almendra": 0, "costo": 17.7, "sueltos": 70.5, "descuento_pct": 0.2766, "ahorro": 19.5, "margen_pct": 0.6529, "ganancia": 33.3, "ganancia_cedida": 19.5}, {"id": 23, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "Chocomaní + Crunchy + Almendra", "n_almendra": 1, "costo": 22.8, "sueltos": 72.0, "descuento_pct": 0.2917, "ahorro": 21.0, "margen_pct": 0.5529, "ganancia": 28.2, "ganancia_cedida": 21.0}, {"id": 24, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "3 Crunchy", "n_almendra": 0, "costo": 17.7, "sueltos": 70.5, "descuento_pct": 0.2766, "ahorro": 19.5, "margen_pct": 0.6529, "ganancia": 33.3, "ganancia_cedida": 19.5}, {"id": 25, "pack": "Pack 3", "n_frascos": 3, "precio_pack": 51.0, "mezcla": "2 Crunchy + Almendra", "n_almendra": 1, "costo": 22.8, "sueltos": 72.0, "descuento_pct": 0.2917, "ahorro": 21.0, "margen_pct": 0.5529, "ganancia": 28.2, "ganancia_cedida": 21.0}, {"id": 26, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "4 Maní", "n_almendra": 0, "costo": 23.2, "sueltos": 92.0, "descuento_pct": 0.3043, "ahorro": 28.0, "margen_pct": 0.6375, "ganancia": 40.8, "ganancia_cedida": 28.0}, {"id": 27, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "3 Maní + Chocomaní", "n_almendra": 0, "costo": 23.3, "sueltos": 92.5, "descuento_pct": 0.3081, "ahorro": 28.5, "margen_pct": 0.6359, "ganancia": 40.7, "ganancia_cedida": 28.5}, {"id": 28, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "3 Maní + Crunchy", "n_almendra": 0, "costo": 23.3, "sueltos": 92.5, "descuento_pct": 0.3081, "ahorro": 28.5, "margen_pct": 0.6359, "ganancia": 40.7, "ganancia_cedida": 28.5}, {"id": 29, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "3 Maní + Almendra", "n_almendra": 1, "costo": 28.4, "sueltos": 94.0, "descuento_pct": 0.3191, "ahorro": 30.0, "margen_pct": 0.5563, "ganancia": 35.6, "ganancia_cedida": 30.0}, {"id": 30, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "2 Maní + 2 Chocomaní", "n_almendra": 0, "costo": 23.4, "sueltos": 93.0, "descuento_pct": 0.3118, "ahorro": 29.0, "margen_pct": 0.6344, "ganancia": 40.6, "ganancia_cedida": 29.0}, {"id": 31, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "2 Maní + Chocomaní + Crunchy", "n_almendra": 0, "costo": 23.4, "sueltos": 93.0, "descuento_pct": 0.3118, "ahorro": 29.0, "margen_pct": 0.6344, "ganancia": 40.6, "ganancia_cedida": 29.0}, {"id": 32, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "2 Maní + Chocomaní + Almendra", "n_almendra": 1, "costo": 28.5, "sueltos": 94.5, "descuento_pct": 0.3228, "ahorro": 30.5, "margen_pct": 0.5547, "ganancia": 35.5, "ganancia_cedida": 30.5}, {"id": 33, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "2 Maní + 2 Crunchy", "n_almendra": 0, "costo": 23.4, "sueltos": 93.0, "descuento_pct": 0.3118, "ahorro": 29.0, "margen_pct": 0.6344, "ganancia": 40.6, "ganancia_cedida": 29.0}, {"id": 34, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "2 Maní + Crunchy + Almendra", "n_almendra": 1, "costo": 28.5, "sueltos": 94.5, "descuento_pct": 0.3228, "ahorro": 30.5, "margen_pct": 0.5547, "ganancia": 35.5, "ganancia_cedida": 30.5}, {"id": 35, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Maní + 3 Chocomaní", "n_almendra": 0, "costo": 23.5, "sueltos": 93.5, "descuento_pct": 0.3155, "ahorro": 29.5, "margen_pct": 0.6328, "ganancia": 40.5, "ganancia_cedida": 29.5}, {"id": 36, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Maní + 2 Chocomaní + Crunchy", "n_almendra": 0, "costo": 23.5, "sueltos": 93.5, "descuento_pct": 0.3155, "ahorro": 29.5, "margen_pct": 0.6328, "ganancia": 40.5, "ganancia_cedida": 29.5}, {"id": 37, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Maní + 2 Chocomaní + Almendra", "n_almendra": 1, "costo": 28.6, "sueltos": 95.0, "descuento_pct": 0.3263, "ahorro": 31.0, "margen_pct": 0.5531, "ganancia": 35.4, "ganancia_cedida": 31.0}, {"id": 38, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Maní + Chocomaní + 2 Crunchy", "n_almendra": 0, "costo": 23.5, "sueltos": 93.5, "descuento_pct": 0.3155, "ahorro": 29.5, "margen_pct": 0.6328, "ganancia": 40.5, "ganancia_cedida": 29.5}, {"id": 39, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Maní + Chocomaní + Crunchy + Almendra", "n_almendra": 1, "costo": 28.6, "sueltos": 95.0, "descuento_pct": 0.3263, "ahorro": 31.0, "margen_pct": 0.5531, "ganancia": 35.4, "ganancia_cedida": 31.0}, {"id": 40, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Maní + 3 Crunchy", "n_almendra": 0, "costo": 23.5, "sueltos": 93.5, "descuento_pct": 0.3155, "ahorro": 29.5, "margen_pct": 0.6328, "ganancia": 40.5, "ganancia_cedida": 29.5}, {"id": 41, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Maní + 2 Crunchy + Almendra", "n_almendra": 1, "costo": 28.6, "sueltos": 95.0, "descuento_pct": 0.3263, "ahorro": 31.0, "margen_pct": 0.5531, "ganancia": 35.4, "ganancia_cedida": 31.0}, {"id": 42, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "4 Chocomaní", "n_almendra": 0, "costo": 23.6, "sueltos": 94.0, "descuento_pct": 0.3191, "ahorro": 30.0, "margen_pct": 0.6312, "ganancia": 40.4, "ganancia_cedida": 30.0}, {"id": 43, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "3 Chocomaní + Crunchy", "n_almendra": 0, "costo": 23.6, "sueltos": 94.0, "descuento_pct": 0.3191, "ahorro": 30.0, "margen_pct": 0.6312, "ganancia": 40.4, "ganancia_cedida": 30.0}, {"id": 44, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "3 Chocomaní + Almendra", "n_almendra": 1, "costo": 28.7, "sueltos": 95.5, "descuento_pct": 0.3298, "ahorro": 31.5, "margen_pct": 0.5516, "ganancia": 35.3, "ganancia_cedida": 31.5}, {"id": 45, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "2 Chocomaní + 2 Crunchy", "n_almendra": 0, "costo": 23.6, "sueltos": 94.0, "descuento_pct": 0.3191, "ahorro": 30.0, "margen_pct": 0.6312, "ganancia": 40.4, "ganancia_cedida": 30.0}, {"id": 46, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "2 Chocomaní + Crunchy + Almendra", "n_almendra": 1, "costo": 28.7, "sueltos": 95.5, "descuento_pct": 0.3298, "ahorro": 31.5, "margen_pct": 0.5516, "ganancia": 35.3, "ganancia_cedida": 31.5}, {"id": 47, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Chocomaní + 3 Crunchy", "n_almendra": 0, "costo": 23.6, "sueltos": 94.0, "descuento_pct": 0.3191, "ahorro": 30.0, "margen_pct": 0.6312, "ganancia": 40.4, "ganancia_cedida": 30.0}, {"id": 48, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "Chocomaní + 2 Crunchy + Almendra", "n_almendra": 1, "costo": 28.7, "sueltos": 95.5, "descuento_pct": 0.3298, "ahorro": 31.5, "margen_pct": 0.5516, "ganancia": 35.3, "ganancia_cedida": 31.5}, {"id": 49, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "4 Crunchy", "n_almendra": 0, "costo": 23.6, "sueltos": 94.0, "descuento_pct": 0.3191, "ahorro": 30.0, "margen_pct": 0.6312, "ganancia": 40.4, "ganancia_cedida": 30.0}, {"id": 50, "pack": "Pack 4", "n_frascos": 4, "precio_pack": 64.0, "mezcla": "3 Crunchy + Almendra", "n_almendra": 1, "costo": 28.7, "sueltos": 95.5, "descuento_pct": 0.3298, "ahorro": 31.5, "margen_pct": 0.5516, "ganancia": 35.3, "ganancia_cedida": 31.5}, {"id": 51, "pack": "Pack almendra x2", "n_frascos": 2, "precio_pack": 46.0, "mezcla": "2 Almendra", "n_almendra": 2, "costo": 22.0, "sueltos": 50.0, "descuento_pct": 0.08, "ahorro": 4.0, "margen_pct": 0.5217, "ganancia": 24.0, "ganancia_cedida": 4.0}, {"id": 52, "pack": "Pack almendra x3", "n_frascos": 3, "precio_pack": 66.0, "mezcla": "3 Almendra", "n_almendra": 3, "costo": 33.0, "sueltos": 75.0, "descuento_pct": 0.12, "ahorro": 9.0, "margen_pct": 0.5, "ganancia": 33.0, "ganancia_cedida": 9.0}], "promociones_terminos": [{"id": 1, "orden": 1, "termino": "Precio fijo por cantidad: 2 frascos S/42, 3 frascos S/51, 4 frascos S/64, elige los sabores que quieras del catálogo.", "por_que": "Un solo mensaje, sin porcentajes ni decimales. El cliente arma su pack y siente que gana; Mr. Peanutt controla el margen."}, {"id": 2, "orden": 2, "termino": "Máximo 1 mantequilla de almendra por pack mixto. Puedes repetir sabor (p. ej. 2 de maní).", "por_que": "La almendra cuesta S/11 (casi el doble). Con 1 por pack el margen nunca baja del objetivo (55%); con 2 sí bajaría."}, {"id": 3, "orden": 3, "termino": "Packs de solo almendra como combos oficiales con precio propio: Pack almendra x2 por S/46, Pack almendra x3 por S/66.", "por_que": "Al que solo quiere almendra se le da su promo sin romper la regla anterior. No siguen el 55% de los mixtos (saldrían a S/49 y S/73, casi sin descuento): se aceptan con 50-52% porque la almendra cuesta S/11."}, {"id": 4, "orden": 4, "termino": "La almendra es el 'upgrade' del pack: elegirla no cuesta más.", "por_que": "Quien pone la almendra siente más descuento y Mr. Peanutt sigue por encima del margen objetivo: es el gancho para hacerla probar."}, {"id": 5, "orden": 5, "termino": "El precio unitario (S/23 / S/23.50 / S/25) no se toca ni se descuenta nunca: el pack es el único descuento.", "por_que": "Si el suelto también tiene descuento, el pack pierde sentido. El pack existe para subir el ticket, no para bajar el precio."}, {"id": 6, "orden": 6, "termino": "Comunicar siempre el ahorro en soles con el ejemplo más común ('3 frascos por S/51, ahorras S/20'), nunca el porcentaje.", "por_que": "S/8 se entiende al instante; 11.4% obliga a calcular. Se cuenta el ahorro sobre el pack más barato posible para no exagerar."}, {"id": 7, "orden": 7, "termino": "Vigencia permanente en el catálogo, no 'solo por hoy'.", "por_que": "Es la escala de precios del consumidor final (igual que la escala de tiendas): lo que se busca es que el ticket promedio suba siempre."}, {"id": 8, "orden": 8, "termino": "No acumulable con otros descuentos, cupones ni con la escala B2B.", "por_que": "Evita que un descuento se monte sobre otro y el margen caiga por debajo del piso sin darse cuenta."}, {"id": 9, "orden": 9, "termino": "Si hay costo de delivery, incluirlo gratis desde el Pack 3 (a validar con el costo real del envío).", "por_que": "El delivery gratis es el motivo n.° 1 para subir de 2 a 3 frascos; hoy no hay dato del costo de envío, por eso queda condicionado."}, {"id": 10, "orden": 10, "termino": "Cualquier pack nuevo se valida en el armador de promociones: margen mínimo 50% con la peor mezcla posible.", "por_que": "Regla de control: la promo se diseña desde el margen, no desde el descuento (así se evita lo que pasó con la promo de 3 almendras)."}, {"id": 11, "orden": 11, "termino": "El precio por frasco dentro del pack no debe bajar de lo que paga la tienda en Comercial (S/15.20 con IGV).", "por_que": "Si el público consigue en el canal directo un precio igual o menor al que paga la tienda, la tienda deja de comprar. Pack 3 a S/51 = S/17.00 por frasco y Pack 4 a S/64 = S/16.00: todavía por encima, pero ya cerca del límite."}], "packs_escenarios": [{"id": 1, "pack": "Pack 2", "n_frascos": 2, "margen_objetivo_pct": 0.65, "precio_pack": 48.0, "precio_por_frasco": 24.0, "costo_peor_mezcla": 16.9, "margen_min_pct": 0.6479, "margen_max_pct": 0.7583, "descuento_min_pct": 0.0103, "descuento_max_pct": -0.0435, "ahorro_min": -2.0, "ahorro_max": 0.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.5789, "es_propuesto": 0}, {"id": 2, "pack": "Pack 2", "n_frascos": 2, "margen_objetivo_pct": 0.6, "precio_pack": 42.0, "precio_por_frasco": 21.0, "costo_peor_mezcla": 16.9, "margen_min_pct": 0.5976, "margen_max_pct": 0.7238, "descuento_min_pct": 0.134, "descuento_max_pct": 0.087, "ahorro_min": 4.0, "ahorro_max": 6.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.3816, "es_propuesto": 1}, {"id": 3, "pack": "Pack 2", "n_frascos": 2, "margen_objetivo_pct": 0.55, "precio_pack": 38.0, "precio_por_frasco": 19.0, "costo_peor_mezcla": 16.9, "margen_min_pct": 0.5553, "margen_max_pct": 0.6947, "descuento_min_pct": 0.2165, "descuento_max_pct": 0.1739, "ahorro_min": 8.0, "ahorro_max": 10.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.25, "es_propuesto": 0}, {"id": 4, "pack": "Pack 2", "n_frascos": 2, "margen_objetivo_pct": 0.5, "precio_pack": 34.0, "precio_por_frasco": 17.0, "costo_peor_mezcla": 16.9, "margen_min_pct": 0.5029, "margen_max_pct": 0.6588, "descuento_min_pct": 0.299, "descuento_max_pct": 0.2609, "ahorro_min": 12.0, "ahorro_max": 14.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.1184, "es_propuesto": 0}, {"id": 5, "pack": "Pack 2", "n_frascos": 2, "margen_objetivo_pct": 0.45, "precio_pack": 31.0, "precio_por_frasco": 15.5, "costo_peor_mezcla": 16.9, "margen_min_pct": 0.4548, "margen_max_pct": 0.6258, "descuento_min_pct": 0.3608, "descuento_max_pct": 0.3261, "ahorro_min": 15.0, "ahorro_max": 17.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.0197, "es_propuesto": 0}, {"id": 6, "pack": "Pack 3", "n_frascos": 3, "margen_objetivo_pct": 0.65, "precio_pack": 65.0, "precio_por_frasco": 21.67, "costo_peor_mezcla": 22.8, "margen_min_pct": 0.6492, "margen_max_pct": 0.7323, "descuento_min_pct": 0.0972, "descuento_max_pct": 0.058, "ahorro_min": 4.0, "ahorro_max": 7.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.4254, "es_propuesto": 0}, {"id": 7, "pack": "Pack 3", "n_frascos": 3, "margen_objetivo_pct": 0.6, "precio_pack": 57.0, "precio_por_frasco": 19.0, "costo_peor_mezcla": 22.8, "margen_min_pct": 0.6, "margen_max_pct": 0.6947, "descuento_min_pct": 0.2083, "descuento_max_pct": 0.1739, "ahorro_min": 12.0, "ahorro_max": 15.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.25, "es_propuesto": 0}, {"id": 8, "pack": "Pack 3", "n_frascos": 3, "margen_objetivo_pct": 0.55, "precio_pack": 51.0, "precio_por_frasco": 17.0, "costo_peor_mezcla": 22.8, "margen_min_pct": 0.5529, "margen_max_pct": 0.6588, "descuento_min_pct": 0.2917, "descuento_max_pct": 0.2609, "ahorro_min": 18.0, "ahorro_max": 21.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.1184, "es_propuesto": 1}, {"id": 9, "pack": "Pack 3", "n_frascos": 3, "margen_objetivo_pct": 0.5, "precio_pack": 46.0, "precio_por_frasco": 15.33, "costo_peor_mezcla": 22.8, "margen_min_pct": 0.5043, "margen_max_pct": 0.6217, "descuento_min_pct": 0.3611, "descuento_max_pct": 0.3333, "ahorro_min": 23.0, "ahorro_max": 26.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.0088, "es_propuesto": 0}, {"id": 10, "pack": "Pack 3", "n_frascos": 3, "margen_objetivo_pct": 0.45, "precio_pack": 41.0, "precio_por_frasco": 13.67, "costo_peor_mezcla": 22.8, "margen_min_pct": 0.4439, "margen_max_pct": 0.5756, "descuento_min_pct": 0.4306, "descuento_max_pct": 0.4058, "ahorro_min": 28.0, "ahorro_max": 31.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": -0.1009, "es_propuesto": 0}, {"id": 11, "pack": "Pack 4", "n_frascos": 4, "margen_objetivo_pct": 0.65, "precio_pack": 82.0, "precio_por_frasco": 20.5, "costo_peor_mezcla": 28.7, "margen_min_pct": 0.65, "margen_max_pct": 0.7171, "descuento_min_pct": 0.1414, "descuento_max_pct": 0.1087, "ahorro_min": 10.0, "ahorro_max": 13.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.3487, "es_propuesto": 0}, {"id": 12, "pack": "Pack 4", "n_frascos": 4, "margen_objetivo_pct": 0.6, "precio_pack": 72.0, "precio_por_frasco": 18.0, "costo_peor_mezcla": 28.7, "margen_min_pct": 0.6014, "margen_max_pct": 0.6778, "descuento_min_pct": 0.2461, "descuento_max_pct": 0.2174, "ahorro_min": 20.0, "ahorro_max": 23.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.1842, "es_propuesto": 0}, {"id": 13, "pack": "Pack 4", "n_frascos": 4, "margen_objetivo_pct": 0.55, "precio_pack": 64.0, "precio_por_frasco": 16.0, "costo_peor_mezcla": 28.7, "margen_min_pct": 0.5516, "margen_max_pct": 0.6375, "descuento_min_pct": 0.3298, "descuento_max_pct": 0.3043, "ahorro_min": 28.0, "ahorro_max": 31.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.0526, "es_propuesto": 1}, {"id": 14, "pack": "Pack 4", "n_frascos": 4, "margen_objetivo_pct": 0.5, "precio_pack": 57.0, "precio_por_frasco": 14.25, "costo_peor_mezcla": 28.7, "margen_min_pct": 0.4965, "margen_max_pct": 0.593, "descuento_min_pct": 0.4031, "descuento_max_pct": 0.3804, "ahorro_min": 35.0, "ahorro_max": 38.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": -0.0625, "es_propuesto": 0}, {"id": 15, "pack": "Pack 4", "n_frascos": 4, "margen_objetivo_pct": 0.45, "precio_pack": 52.0, "precio_por_frasco": 13.0, "costo_peor_mezcla": 28.7, "margen_min_pct": 0.4481, "margen_max_pct": 0.5538, "descuento_min_pct": 0.4555, "descuento_max_pct": 0.4348, "ahorro_min": 40.0, "ahorro_max": 43.5, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": -0.1447, "es_propuesto": 0}, {"id": 16, "pack": "Pack almendra x2", "n_frascos": 2, "margen_objetivo_pct": 0.65, "precio_pack": 63.0, "precio_por_frasco": 31.5, "costo_peor_mezcla": 22.0, "margen_min_pct": 0.6508, "margen_max_pct": 0.6508, "descuento_min_pct": -0.26, "descuento_max_pct": -0.26, "ahorro_min": -13.0, "ahorro_max": -13.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 1.0724, "es_propuesto": 0}, {"id": 17, "pack": "Pack almendra x2", "n_frascos": 2, "margen_objetivo_pct": 0.6, "precio_pack": 55.0, "precio_por_frasco": 27.5, "costo_peor_mezcla": 22.0, "margen_min_pct": 0.6, "margen_max_pct": 0.6, "descuento_min_pct": -0.1, "descuento_max_pct": -0.1, "ahorro_min": -5.0, "ahorro_max": -5.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.8092, "es_propuesto": 0}, {"id": 18, "pack": "Pack almendra x2", "n_frascos": 2, "margen_objetivo_pct": 0.55, "precio_pack": 49.0, "precio_por_frasco": 24.5, "costo_peor_mezcla": 22.0, "margen_min_pct": 0.551, "margen_max_pct": 0.551, "descuento_min_pct": 0.02, "descuento_max_pct": 0.02, "ahorro_min": 1.0, "ahorro_max": 1.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.6118, "es_propuesto": 0}, {"id": 19, "pack": "Pack almendra x2", "n_frascos": 2, "margen_objetivo_pct": 0.5, "precio_pack": 44.0, "precio_por_frasco": 22.0, "costo_peor_mezcla": 22.0, "margen_min_pct": 0.5, "margen_max_pct": 0.5, "descuento_min_pct": 0.12, "descuento_max_pct": 0.12, "ahorro_min": 6.0, "ahorro_max": 6.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.4474, "es_propuesto": 0}, {"id": 20, "pack": "Pack almendra x2", "n_frascos": 2, "margen_objetivo_pct": 0.45, "precio_pack": 40.0, "precio_por_frasco": 20.0, "costo_peor_mezcla": 22.0, "margen_min_pct": 0.45, "margen_max_pct": 0.45, "descuento_min_pct": 0.2, "descuento_max_pct": 0.2, "ahorro_min": 10.0, "ahorro_max": 10.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.3158, "es_propuesto": 0}, {"id": 21, "pack": "Pack almendra x3", "n_frascos": 3, "margen_objetivo_pct": 0.65, "precio_pack": 94.0, "precio_por_frasco": 31.33, "costo_peor_mezcla": 33.0, "margen_min_pct": 0.6489, "margen_max_pct": 0.6489, "descuento_min_pct": -0.2533, "descuento_max_pct": -0.2533, "ahorro_min": -19.0, "ahorro_max": -19.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 1.0614, "es_propuesto": 0}, {"id": 22, "pack": "Pack almendra x3", "n_frascos": 3, "margen_objetivo_pct": 0.6, "precio_pack": 82.0, "precio_por_frasco": 27.33, "costo_peor_mezcla": 33.0, "margen_min_pct": 0.5976, "margen_max_pct": 0.5976, "descuento_min_pct": -0.0933, "descuento_max_pct": -0.0933, "ahorro_min": -7.0, "ahorro_max": -7.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.7982, "es_propuesto": 0}, {"id": 23, "pack": "Pack almendra x3", "n_frascos": 3, "margen_objetivo_pct": 0.55, "precio_pack": 73.0, "precio_por_frasco": 24.33, "costo_peor_mezcla": 33.0, "margen_min_pct": 0.5479, "margen_max_pct": 0.5479, "descuento_min_pct": 0.0267, "descuento_max_pct": 0.0267, "ahorro_min": 2.0, "ahorro_max": 2.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.6009, "es_propuesto": 0}, {"id": 24, "pack": "Pack almendra x3", "n_frascos": 3, "margen_objetivo_pct": 0.5, "precio_pack": 66.0, "precio_por_frasco": 22.0, "costo_peor_mezcla": 33.0, "margen_min_pct": 0.5, "margen_max_pct": 0.5, "descuento_min_pct": 0.12, "descuento_max_pct": 0.12, "ahorro_min": 9.0, "ahorro_max": 9.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.4474, "es_propuesto": 1}, {"id": 25, "pack": "Pack almendra x3", "n_frascos": 3, "margen_objetivo_pct": 0.45, "precio_pack": 60.0, "precio_por_frasco": 20.0, "costo_peor_mezcla": 33.0, "margen_min_pct": 0.45, "margen_max_pct": 0.45, "descuento_min_pct": 0.2, "descuento_max_pct": 0.2, "ahorro_min": 15.0, "ahorro_max": 15.0, "precio_tienda_comercial": 15.2, "sobre_precio_tienda_pct": 0.3158, "es_propuesto": 0}], "escala_b2b_excel": [{"id": 1, "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "tramo": 1, "nombre_tramo": "Precio comercial - Balde de 4kg", "condicion_excel": "Compra base (1-2 baldes)", "compra_minima_soles": 0.0, "costo": 46.89, "margen_mrpeanutt_pct": 0.59, "precio_sin_igv": 114.37, "precio_con_igv": 134.95, "ganancia_unit_sin_igv": 67.48, "descuento_vs_comercial_pct": 0.0, "unidades_minimas": null, "precio_por_kg_con_igv": 33.74, "pvp_referencia": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "fuente": "Hoja 1!A24:H24"}, {"id": 2, "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "tramo": 2, "nombre_tramo": "Precio Mayorista - Balde de 4kg", "condicion_excel": "Compras mayores a 400 soles", "compra_minima_soles": 400.0, "costo": 46.89, "margen_mrpeanutt_pct": 0.52, "precio_sin_igv": 97.69, "precio_con_igv": 115.27, "ganancia_unit_sin_igv": 50.8, "descuento_vs_comercial_pct": 0.1458, "unidades_minimas": 3.47, "precio_por_kg_con_igv": 28.82, "pvp_referencia": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "fuente": "Hoja 1!A25:H25"}, {"id": 3, "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "tramo": 3, "nombre_tramo": "Precio Distribuidor - Balde de 4kg", "condicion_excel": "Compras mayores a 650 soles", "compra_minima_soles": 650.0, "costo": 46.89, "margen_mrpeanutt_pct": 0.458, "precio_sin_igv": 86.51, "precio_con_igv": 102.09, "ganancia_unit_sin_igv": 39.62, "descuento_vs_comercial_pct": 0.2435, "unidades_minimas": 6.37, "precio_por_kg_con_igv": 25.52, "pvp_referencia": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "fuente": "Hoja 1!A26:H26"}, {"id": 4, "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "tramo": 4, "nombre_tramo": "Precio Exclusivo - Balde de 4kg", "condicion_excel": "Compras mayores a 900 soles", "compra_minima_soles": 900.0, "costo": 46.89, "margen_mrpeanutt_pct": 0.412, "precio_sin_igv": 79.74, "precio_con_igv": 94.1, "ganancia_unit_sin_igv": 32.85, "descuento_vs_comercial_pct": 0.3027, "unidades_minimas": 9.56, "precio_por_kg_con_igv": 23.52, "pvp_referencia": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "fuente": "Hoja 1!A27:H27"}, {"id": 5, "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "tramo": 1, "nombre_tramo": "Precio Comercial", "condicion_excel": "Pedidos menores a 500", "compra_minima_soles": 0.0, "costo": 5.8, "margen_mrpeanutt_pct": 0.586, "precio_sin_igv": 14.01, "precio_con_igv": 16.53, "ganancia_unit_sin_igv": 8.21, "descuento_vs_comercial_pct": 0.0, "unidades_minimas": null, "precio_por_kg_con_igv": 110.21, "pvp_referencia": 23.0, "margen_tienda_pct": 0.2812, "ganancia_tienda_unit": 6.47, "markup_tienda_pct": 0.3913, "fuente": "Hoja 1!A31:H31"}, {"id": 6, "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "tramo": 2, "nombre_tramo": "Precio Mayorista", "condicion_excel": "Pedidos mayores a 700", "compra_minima_soles": 700.0, "costo": 5.8, "margen_mrpeanutt_pct": 0.5, "precio_sin_igv": 11.6, "precio_con_igv": 13.69, "ganancia_unit_sin_igv": 5.8, "descuento_vs_comercial_pct": 0.172, "unidades_minimas": 51.14, "precio_por_kg_con_igv": 91.25, "pvp_referencia": 23.0, "margen_tienda_pct": 0.4049, "ganancia_tienda_unit": 9.31, "markup_tienda_pct": 0.6803, "fuente": "Hoja 1!A32:H32"}, {"id": 7, "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "tramo": 3, "nombre_tramo": "Precio Distribuidor", "condicion_excel": "Pedidos mayores a 1000", "compra_minima_soles": 1000.0, "costo": 5.8, "margen_mrpeanutt_pct": 0.45, "precio_sin_igv": 10.55, "precio_con_igv": 12.44, "ganancia_unit_sin_igv": 4.75, "descuento_vs_comercial_pct": 0.2473, "unidades_minimas": 80.36, "precio_por_kg_con_igv": 82.96, "pvp_referencia": 23.0, "margen_tienda_pct": 0.459, "ganancia_tienda_unit": 10.56, "markup_tienda_pct": 0.8483, "fuente": "Hoja 1!A33:H33"}, {"id": 8, "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "tramo": 4, "nombre_tramo": "Precio Exclusivo", "condicion_excel": "Pedidos mayores a 1600", "compra_minima_soles": 1600.0, "costo": 5.8, "margen_mrpeanutt_pct": 0.4, "precio_sin_igv": 9.67, "precio_con_igv": 11.41, "ganancia_unit_sin_igv": 3.87, "descuento_vs_comercial_pct": 0.31, "unidades_minimas": 140.27, "precio_por_kg_con_igv": 76.04, "pvp_referencia": 23.0, "margen_tienda_pct": 0.5041, "ganancia_tienda_unit": 11.59, "markup_tienda_pct": 1.0164, "fuente": "Hoja 1!A34:H34"}, {"id": 9, "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "tramo": 1, "nombre_tramo": "Precio Comercial", "condicion_excel": "Pedidos menores a 500", "compra_minima_soles": 0.0, "costo": 11.0, "margen_mrpeanutt_pct": 0.3, "precio_sin_igv": 15.71, "precio_con_igv": 18.54, "ganancia_unit_sin_igv": 4.71, "descuento_vs_comercial_pct": 0.0, "unidades_minimas": null, "precio_por_kg_con_igv": 123.62, "pvp_referencia": 25.0, "margen_tienda_pct": 0.2583, "ganancia_tienda_unit": 6.46, "markup_tienda_pct": 0.3482, "fuente": "Hoja 1!A38:H38"}, {"id": 10, "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "tramo": 2, "nombre_tramo": "Precio Mayorista", "condicion_excel": "Pedidos mayores a 700", "compra_minima_soles": 700.0, "costo": 11.0, "margen_mrpeanutt_pct": 0.22, "precio_sin_igv": 14.1, "precio_con_igv": 16.64, "ganancia_unit_sin_igv": 3.1, "descuento_vs_comercial_pct": 0.1026, "unidades_minimas": 42.06, "precio_por_kg_con_igv": 110.94, "pvp_referencia": 25.0, "margen_tienda_pct": 0.3344, "ganancia_tienda_unit": 8.36, "markup_tienda_pct": 0.5023, "fuente": "Hoja 1!A39:H39"}, {"id": 11, "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "tramo": 3, "nombre_tramo": "Precio Distribuidor", "condicion_excel": "Pedidos mayores a 1000", "compra_minima_soles": 1000.0, "costo": 11.0, "margen_mrpeanutt_pct": 0.19, "precio_sin_igv": 13.58, "precio_con_igv": 16.02, "ganancia_unit_sin_igv": 2.58, "descuento_vs_comercial_pct": 0.1358, "unidades_minimas": 62.4, "precio_por_kg_con_igv": 106.83, "pvp_referencia": 25.0, "margen_tienda_pct": 0.359, "ganancia_tienda_unit": 8.98, "markup_tienda_pct": 0.5601, "fuente": "Hoja 1!A40:H40"}, {"id": 12, "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "tramo": 4, "nombre_tramo": "Precio Exclusivo", "condicion_excel": "Pedidos mayores a 1600", "compra_minima_soles": 1600.0, "costo": 11.0, "margen_mrpeanutt_pct": 0.15, "precio_sin_igv": 12.94, "precio_con_igv": 15.27, "ganancia_unit_sin_igv": 1.94, "descuento_vs_comercial_pct": 0.1765, "unidades_minimas": 104.78, "precio_por_kg_con_igv": 101.8, "pvp_referencia": 25.0, "margen_tienda_pct": 0.3892, "ganancia_tienda_unit": 9.73, "markup_tienda_pct": 0.6371, "fuente": "Hoja 1!A41:H41"}], "escala_b2b_propuesta": [{"id": 1, "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "clave": "mani", "tramo": 1, "nombre_tramo": "Comercial", "condicion": "Pedidos menores a S/700", "compra_minima_con_igv": 0.0, "unidades_minimas": 1, "costo": 5.8, "margen_objetivo_pct": 0.55, "precio_con_igv": 15.2, "precio_sin_igv": 12.88, "margen_mrpeanutt_pct": 0.5497, "ganancia_unit_sin_igv": 7.08, "descuento_vs_comercial_pct": 0.0, "precio_por_kg_con_igv": 101.33, "pvp_sugerido": 23.0, "margen_tienda_pct": 0.3391, "ganancia_tienda_unit": 7.8, "markup_tienda_pct": 0.5132, "semaforo_tienda": "ok", "cambio_vs_excel": "Margen Excel 58.6% -> propuesta 55.0%"}, {"id": 2, "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "clave": "mani", "tramo": 2, "nombre_tramo": "Mayorista", "condicion": "Pedidos desde S/700", "compra_minima_con_igv": 700.0, "unidades_minimas": 52, "costo": 5.8, "margen_objetivo_pct": 0.5, "precio_con_igv": 13.7, "precio_sin_igv": 11.61, "margen_mrpeanutt_pct": 0.5004, "ganancia_unit_sin_igv": 5.81, "descuento_vs_comercial_pct": 0.0986, "precio_por_kg_con_igv": 91.33, "pvp_sugerido": 23.0, "margen_tienda_pct": 0.4043, "ganancia_tienda_unit": 9.3, "markup_tienda_pct": 0.6788, "semaforo_tienda": "ok", "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 3, "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "clave": "mani", "tramo": 3, "nombre_tramo": "Distribuidor", "condicion": "Pedidos desde S/1,000", "compra_minima_con_igv": 1000.0, "unidades_minimas": 81, "costo": 5.8, "margen_objetivo_pct": 0.45, "precio_con_igv": 12.4, "precio_sin_igv": 10.51, "margen_mrpeanutt_pct": 0.4481, "ganancia_unit_sin_igv": 4.71, "descuento_vs_comercial_pct": 0.184, "precio_por_kg_con_igv": 82.67, "pvp_sugerido": 23.0, "margen_tienda_pct": 0.4609, "ganancia_tienda_unit": 10.6, "markup_tienda_pct": 0.8548, "semaforo_tienda": "ok", "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 4, "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "clave": "mani", "tramo": 4, "nombre_tramo": "Exclusivo", "condicion": "Pedidos desde S/1,600", "compra_minima_con_igv": 1600.0, "unidades_minimas": 141, "costo": 5.8, "margen_objetivo_pct": 0.4, "precio_con_igv": 11.4, "precio_sin_igv": 9.66, "margen_mrpeanutt_pct": 0.3996, "ganancia_unit_sin_igv": 3.86, "descuento_vs_comercial_pct": 0.25, "precio_por_kg_con_igv": 76.0, "pvp_sugerido": 23.0, "margen_tienda_pct": 0.5043, "ganancia_tienda_unit": 11.6, "markup_tienda_pct": 1.0175, "semaforo_tienda": "ok", "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 5, "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "tramo": 1, "nombre_tramo": "Comercial", "condicion": "Pedidos menores a S/700", "compra_minima_con_igv": 0.0, "unidades_minimas": 1, "costo": 11.0, "margen_objetivo_pct": 0.3, "precio_con_igv": 18.5, "precio_sin_igv": 15.68, "margen_mrpeanutt_pct": 0.2984, "ganancia_unit_sin_igv": 4.68, "descuento_vs_comercial_pct": 0.0, "precio_por_kg_con_igv": 123.33, "pvp_sugerido": 25.0, "margen_tienda_pct": 0.26, "ganancia_tienda_unit": 6.5, "markup_tienda_pct": 0.3514, "semaforo_tienda": "ajustado", "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 6, "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "tramo": 2, "nombre_tramo": "Mayorista", "condicion": "Pedidos desde S/700", "compra_minima_con_igv": 700.0, "unidades_minimas": 43, "costo": 11.0, "margen_objetivo_pct": 0.22, "precio_con_igv": 16.6, "precio_sin_igv": 14.07, "margen_mrpeanutt_pct": 0.2181, "ganancia_unit_sin_igv": 3.07, "descuento_vs_comercial_pct": 0.1027, "precio_por_kg_con_igv": 110.67, "pvp_sugerido": 25.0, "margen_tienda_pct": 0.336, "ganancia_tienda_unit": 8.4, "markup_tienda_pct": 0.506, "semaforo_tienda": "ok", "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 7, "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "tramo": 3, "nombre_tramo": "Distribuidor", "condicion": "Pedidos desde S/1,000", "compra_minima_con_igv": 1000.0, "unidades_minimas": 63, "costo": 11.0, "margen_objetivo_pct": 0.19, "precio_con_igv": 16.0, "precio_sin_igv": 13.56, "margen_mrpeanutt_pct": 0.1888, "ganancia_unit_sin_igv": 2.56, "descuento_vs_comercial_pct": 0.1352, "precio_por_kg_con_igv": 106.67, "pvp_sugerido": 25.0, "margen_tienda_pct": 0.36, "ganancia_tienda_unit": 9.0, "markup_tienda_pct": 0.5625, "semaforo_tienda": "ok", "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 8, "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "tramo": 4, "nombre_tramo": "Exclusivo", "condicion": "Pedidos desde S/1,600", "compra_minima_con_igv": 1600.0, "unidades_minimas": 105, "costo": 11.0, "margen_objetivo_pct": 0.15, "precio_con_igv": 15.3, "precio_sin_igv": 12.97, "margen_mrpeanutt_pct": 0.1516, "ganancia_unit_sin_igv": 1.97, "descuento_vs_comercial_pct": 0.1728, "precio_por_kg_con_igv": 102.0, "pvp_sugerido": 25.0, "margen_tienda_pct": 0.388, "ganancia_tienda_unit": 9.7, "markup_tienda_pct": 0.634, "semaforo_tienda": "ok", "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 9, "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "clave": "balde4", "tramo": 1, "nombre_tramo": "Comercial", "condicion": "1 a 3 baldes", "compra_minima_con_igv": 135.0, "unidades_minimas": 1, "costo": 46.89, "margen_objetivo_pct": 0.59, "precio_con_igv": 135.0, "precio_sin_igv": 114.41, "margen_mrpeanutt_pct": 0.5901, "ganancia_unit_sin_igv": 67.52, "descuento_vs_comercial_pct": 0.0, "precio_por_kg_con_igv": 33.75, "pvp_sugerido": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "semaforo_tienda": null, "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 10, "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "clave": "balde4", "tramo": 2, "nombre_tramo": "Mayorista", "condicion": "4 a 6 baldes", "compra_minima_con_igv": 460.0, "unidades_minimas": 4, "costo": 46.89, "margen_objetivo_pct": 0.52, "precio_con_igv": 115.0, "precio_sin_igv": 97.46, "margen_mrpeanutt_pct": 0.5189, "ganancia_unit_sin_igv": 50.57, "descuento_vs_comercial_pct": 0.1482, "precio_por_kg_con_igv": 28.75, "pvp_sugerido": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "semaforo_tienda": null, "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 11, "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "clave": "balde4", "tramo": 3, "nombre_tramo": "Distribuidor", "condicion": "7 a 9 baldes", "compra_minima_con_igv": 714.0, "unidades_minimas": 7, "costo": 46.89, "margen_objetivo_pct": 0.458, "precio_con_igv": 102.0, "precio_sin_igv": 86.44, "margen_mrpeanutt_pct": 0.4575, "ganancia_unit_sin_igv": 39.55, "descuento_vs_comercial_pct": 0.2445, "precio_por_kg_con_igv": 25.5, "pvp_sugerido": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "semaforo_tienda": null, "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 12, "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "clave": "balde4", "tramo": 4, "nombre_tramo": "Exclusivo", "condicion": "10 baldes o más", "compra_minima_con_igv": 940.0, "unidades_minimas": 10, "costo": 46.89, "margen_objetivo_pct": 0.412, "precio_con_igv": 94.0, "precio_sin_igv": 79.66, "margen_mrpeanutt_pct": 0.4114, "ganancia_unit_sin_igv": 32.77, "descuento_vs_comercial_pct": 0.3037, "precio_por_kg_con_igv": 23.5, "pvp_sugerido": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "semaforo_tienda": null, "cambio_vs_excel": "Igual al Excel (solo redondeo de precio)"}, {"id": 13, "segmento": "RESTAURANTES", "producto": "Balde 1 kg", "clave": "balde1", "tramo": 1, "nombre_tramo": "Comercial", "condicion": "1 a 3 baldes", "compra_minima_con_igv": 42.0, "unidades_minimas": 1, "costo": 14.7, "margen_objetivo_pct": 0.59, "precio_con_igv": 42.0, "precio_sin_igv": 35.59, "margen_mrpeanutt_pct": 0.587, "ganancia_unit_sin_igv": 20.89, "descuento_vs_comercial_pct": 0.0, "precio_por_kg_con_igv": 42.0, "pvp_sugerido": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "semaforo_tienda": null, "cambio_vs_excel": "Igual al Excel (solo redondeo de precio); costeo propuesto (A4)"}, {"id": 14, "segmento": "RESTAURANTES", "producto": "Balde 1 kg", "clave": "balde1", "tramo": 2, "nombre_tramo": "Mayorista", "condicion": "4 a 6 baldes", "compra_minima_con_igv": 144.0, "unidades_minimas": 4, "costo": 14.7, "margen_objetivo_pct": 0.52, "precio_con_igv": 36.0, "precio_sin_igv": 30.51, "margen_mrpeanutt_pct": 0.5182, "ganancia_unit_sin_igv": 15.81, "descuento_vs_comercial_pct": 0.1427, "precio_por_kg_con_igv": 36.0, "pvp_sugerido": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "semaforo_tienda": null, "cambio_vs_excel": "Igual al Excel (solo redondeo de precio); costeo propuesto (A4)"}, {"id": 15, "segmento": "RESTAURANTES", "producto": "Balde 1 kg", "clave": "balde1", "tramo": 3, "nombre_tramo": "Distribuidor", "condicion": "7 a 9 baldes", "compra_minima_con_igv": 224.0, "unidades_minimas": 7, "costo": 14.7, "margen_objetivo_pct": 0.458, "precio_con_igv": 32.0, "precio_sin_igv": 27.12, "margen_mrpeanutt_pct": 0.4579, "ganancia_unit_sin_igv": 12.42, "descuento_vs_comercial_pct": 0.238, "precio_por_kg_con_igv": 32.0, "pvp_sugerido": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "semaforo_tienda": null, "cambio_vs_excel": "Igual al Excel (solo redondeo de precio); costeo propuesto (A4)"}, {"id": 16, "segmento": "RESTAURANTES", "producto": "Balde 1 kg", "clave": "balde1", "tramo": 4, "nombre_tramo": "Exclusivo", "condicion": "10 baldes o más", "compra_minima_con_igv": 290.0, "unidades_minimas": 10, "costo": 14.7, "margen_objetivo_pct": 0.412, "precio_con_igv": 29.0, "precio_sin_igv": 24.58, "margen_mrpeanutt_pct": 0.4019, "ganancia_unit_sin_igv": 9.88, "descuento_vs_comercial_pct": 0.3094, "precio_por_kg_con_igv": 29.0, "pvp_sugerido": null, "margen_tienda_pct": null, "ganancia_tienda_unit": null, "markup_tienda_pct": null, "semaforo_tienda": null, "cambio_vs_excel": "Margen Excel 41.2% -> propuesta 40.2%; costeo propuesto (A4)"}], "cadena_valor": [{"id": 1, "escenario": "1. Venta directa al público (sin IGV, NRUS)", "producto": "Mantequilla de maní 150 g", "clave": "mani", "pvp_con_igv": 23.0, "pvp_sin_igv": 23.0, "costo": 5.8, "contribucion_total_sin_igv": 17.2, "eslabon_1": "Mr. Peanutt", "gana_1": 17.2, "margen_1_pct": 0.7478, "eslabon_2": null, "gana_2": null, "margen_2_pct": null, "eslabon_3": null, "gana_3": null, "margen_3_pct": null, "comentario": "Mr. Peanutt se queda con toda la contribución (pero asume venta, delivery y marketing al consumidor)."}, {"id": 2, "escenario": "2. Tienda compra al precio Comercial", "producto": "Mantequilla de maní 150 g", "clave": "mani", "pvp_con_igv": 23.0, "pvp_sin_igv": 19.49, "costo": 5.8, "contribucion_total_sin_igv": 13.69, "eslabon_1": "Mr. Peanutt", "gana_1": 7.08, "margen_1_pct": 0.5497, "eslabon_2": "Tienda", "gana_2": 6.61, "margen_2_pct": 0.3391, "eslabon_3": null, "gana_3": null, "margen_3_pct": null, "comentario": "La tienda pone la góndola y el cliente; Mr. Peanutt vende por volumen."}, {"id": 3, "escenario": "3. Distribuidor (Exclusivo) -> tienda (Comercial) -> público", "producto": "Mantequilla de maní 150 g", "clave": "mani", "pvp_con_igv": 23.0, "pvp_sin_igv": 19.49, "costo": 5.8, "contribucion_total_sin_igv": 13.69, "eslabon_1": "Mr. Peanutt", "gana_1": 3.86, "margen_1_pct": 0.3996, "eslabon_2": "Distribuidor", "gana_2": 3.22, "margen_2_pct": 0.25, "eslabon_3": "Tienda", "gana_3": 6.61, "margen_3_pct": 0.3391, "comentario": "Los tramos Distribuidor/Exclusivo existen para quien revende a tiendas: aquí el distribuidor se queda con 25% y la tienda sigue ganando 34%."}, {"id": 4, "escenario": "1. Venta directa al público (sin IGV, NRUS)", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "pvp_con_igv": 25.0, "pvp_sin_igv": 25.0, "costo": 11.0, "contribucion_total_sin_igv": 14.0, "eslabon_1": "Mr. Peanutt", "gana_1": 14.0, "margen_1_pct": 0.56, "eslabon_2": null, "gana_2": null, "margen_2_pct": null, "eslabon_3": null, "gana_3": null, "margen_3_pct": null, "comentario": "Mr. Peanutt se queda con toda la contribución (pero asume venta, delivery y marketing al consumidor)."}, {"id": 5, "escenario": "2. Tienda compra al precio Comercial", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "pvp_con_igv": 25.0, "pvp_sin_igv": 21.19, "costo": 11.0, "contribucion_total_sin_igv": 10.19, "eslabon_1": "Mr. Peanutt", "gana_1": 4.68, "margen_1_pct": 0.2984, "eslabon_2": "Tienda", "gana_2": 5.51, "margen_2_pct": 0.26, "eslabon_3": null, "gana_3": null, "margen_3_pct": null, "comentario": "La tienda pone la góndola y el cliente; Mr. Peanutt vende por volumen."}, {"id": 6, "escenario": "3. Distribuidor (Exclusivo) -> tienda (Comercial) -> público", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "pvp_con_igv": 25.0, "pvp_sin_igv": 21.19, "costo": 11.0, "contribucion_total_sin_igv": 10.19, "eslabon_1": "Mr. Peanutt", "gana_1": 1.97, "margen_1_pct": 0.1516, "eslabon_2": "Distribuidor", "gana_2": 2.71, "margen_2_pct": 0.173, "eslabon_3": "Tienda", "gana_3": 5.51, "margen_3_pct": 0.26, "comentario": "Con costo S/11.00 y PVP S/25 el producto NO aguanta tres eslabones: al distribuidor solo le quedan 17%. Sugerido: vender la almendra por B2B solo en Comercial/Mayorista."}], "restaurantes_porcion": [{"id": 1, "formato": "Frasco 150 g (precio Comercial tiendas)", "tramo": 1, "nombre_tramo": "Comercial", "precio_con_igv": 15.2, "peso_kg": 0.15, "precio_por_kg_con_igv": 101.33, "porcion_gr": 30.0, "costo_porcion": 3.04, "ahorro_vs_frasco_pct": 0.0, "margen_mrpeanutt_pct": 0.5497, "ganancia_mrpeanutt_por_kg": 47.21}, {"id": 2, "formato": "Balde 4 kg", "tramo": 1, "nombre_tramo": "Comercial", "precio_con_igv": 135.0, "peso_kg": 4.0, "precio_por_kg_con_igv": 33.75, "porcion_gr": 30.0, "costo_porcion": 1.01, "ahorro_vs_frasco_pct": 0.6669, "margen_mrpeanutt_pct": 0.5901, "ganancia_mrpeanutt_por_kg": 16.88}, {"id": 3, "formato": "Balde 4 kg", "tramo": 2, "nombre_tramo": "Mayorista", "precio_con_igv": 115.0, "peso_kg": 4.0, "precio_por_kg_con_igv": 28.75, "porcion_gr": 30.0, "costo_porcion": 0.86, "ahorro_vs_frasco_pct": 0.7163, "margen_mrpeanutt_pct": 0.5189, "ganancia_mrpeanutt_por_kg": 12.64}, {"id": 4, "formato": "Balde 4 kg", "tramo": 3, "nombre_tramo": "Distribuidor", "precio_con_igv": 102.0, "peso_kg": 4.0, "precio_por_kg_con_igv": 25.5, "porcion_gr": 30.0, "costo_porcion": 0.77, "ahorro_vs_frasco_pct": 0.7484, "margen_mrpeanutt_pct": 0.4575, "ganancia_mrpeanutt_por_kg": 9.89}, {"id": 5, "formato": "Balde 4 kg", "tramo": 4, "nombre_tramo": "Exclusivo", "precio_con_igv": 94.0, "peso_kg": 4.0, "precio_por_kg_con_igv": 23.5, "porcion_gr": 30.0, "costo_porcion": 0.7, "ahorro_vs_frasco_pct": 0.7681, "margen_mrpeanutt_pct": 0.4114, "ganancia_mrpeanutt_por_kg": 8.19}, {"id": 6, "formato": "Balde 1 kg (propuesto)", "tramo": 1, "nombre_tramo": "Comercial", "precio_con_igv": 42.0, "peso_kg": 1.0, "precio_por_kg_con_igv": 42.0, "porcion_gr": 30.0, "costo_porcion": 1.26, "ahorro_vs_frasco_pct": 0.5855, "margen_mrpeanutt_pct": 0.587, "ganancia_mrpeanutt_por_kg": 20.89}, {"id": 7, "formato": "Balde 1 kg (propuesto)", "tramo": 2, "nombre_tramo": "Mayorista", "precio_con_igv": 36.0, "peso_kg": 1.0, "precio_por_kg_con_igv": 36.0, "porcion_gr": 30.0, "costo_porcion": 1.08, "ahorro_vs_frasco_pct": 0.6447, "margen_mrpeanutt_pct": 0.5182, "ganancia_mrpeanutt_por_kg": 15.81}, {"id": 8, "formato": "Balde 1 kg (propuesto)", "tramo": 3, "nombre_tramo": "Distribuidor", "precio_con_igv": 32.0, "peso_kg": 1.0, "precio_por_kg_con_igv": 32.0, "porcion_gr": 30.0, "costo_porcion": 0.96, "ahorro_vs_frasco_pct": 0.6842, "margen_mrpeanutt_pct": 0.4579, "ganancia_mrpeanutt_por_kg": 12.42}, {"id": 9, "formato": "Balde 1 kg (propuesto)", "tramo": 4, "nombre_tramo": "Exclusivo", "precio_con_igv": 29.0, "peso_kg": 1.0, "precio_por_kg_con_igv": 29.0, "porcion_gr": 30.0, "costo_porcion": 0.87, "ahorro_vs_frasco_pct": 0.7138, "margen_mrpeanutt_pct": 0.4019, "ganancia_mrpeanutt_por_kg": 9.88}], "resumen_margenes": [{"id": 1, "canal": "DIRECTO", "segmento": "Público", "producto": "Mantequilla de mani 150gr", "clave": "mani", "version": "actual", "margen_min_pct": 0.7478, "margen_max_pct": 0.7478, "margen_tienda_min_pct": null, "margen_tienda_max_pct": null}, {"id": 2, "canal": "DIRECTO", "segmento": "Público", "producto": "Mantequilla Almendra 150gr", "clave": "almendra", "version": "actual", "margen_min_pct": 0.56, "margen_max_pct": 0.56, "margen_tienda_min_pct": null, "margen_tienda_max_pct": null}, {"id": 3, "canal": "DIRECTO", "segmento": "Público", "producto": "Mantequilla de Chocomaní 150gr", "clave": "chocomani", "version": "actual", "margen_min_pct": 0.7489, "margen_max_pct": 0.7489, "margen_tienda_min_pct": null, "margen_tienda_max_pct": null}, {"id": 4, "canal": "DIRECTO", "segmento": "Público", "producto": "Mantequilla Crunchi 150gr", "clave": "crunchy", "version": "actual", "margen_min_pct": 0.7489, "margen_max_pct": 0.7489, "margen_tienda_min_pct": null, "margen_tienda_max_pct": null}, {"id": 5, "canal": "B2B", "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "clave": null, "version": "excel", "margen_min_pct": 0.412, "margen_max_pct": 0.59, "margen_tienda_min_pct": null, "margen_tienda_max_pct": null}, {"id": 6, "canal": "B2B", "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "clave": null, "version": "excel", "margen_min_pct": 0.4, "margen_max_pct": 0.586, "margen_tienda_min_pct": 0.2812, "margen_tienda_max_pct": 0.5041}, {"id": 7, "canal": "B2B", "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "clave": null, "version": "excel", "margen_min_pct": 0.15, "margen_max_pct": 0.3, "margen_tienda_min_pct": 0.2583, "margen_tienda_max_pct": 0.3892}, {"id": 8, "canal": "B2B", "segmento": "TIENDAS", "producto": "Mantequilla de maní 150 g", "clave": "mani", "version": "propuesta", "margen_min_pct": 0.3996, "margen_max_pct": 0.5497, "margen_tienda_min_pct": 0.3391, "margen_tienda_max_pct": 0.5043}, {"id": 9, "canal": "B2B", "segmento": "TIENDAS", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "version": "propuesta", "margen_min_pct": 0.1516, "margen_max_pct": 0.2984, "margen_tienda_min_pct": 0.26, "margen_tienda_max_pct": 0.388}, {"id": 10, "canal": "B2B", "segmento": "RESTAURANTES", "producto": "Balde 4 kg", "clave": "balde4", "version": "propuesta", "margen_min_pct": 0.4114, "margen_max_pct": 0.5901, "margen_tienda_min_pct": null, "margen_tienda_max_pct": null}, {"id": 11, "canal": "B2B", "segmento": "RESTAURANTES", "producto": "Balde 1 kg", "clave": "balde1", "version": "propuesta", "margen_min_pct": 0.4019, "margen_max_pct": 0.587, "margen_tienda_min_pct": null, "margen_tienda_max_pct": null}], "costos_fijos": [{"id": 1, "concepto": "Sueldo", "categoria": "Personal", "monto_mensual": 1020.0, "nota": "Decisión del usuario 2026-09-18"}, {"id": 2, "concepto": "NRUS (cuota mensual del régimen tributario)", "categoria": "Tributario", "monto_mensual": 50.0, "nota": "Se toma el tope de S/50 (la cuota real hoy es S/20)"}, {"id": 3, "concepto": "Cloud (USD 20/mes)", "categoria": "Tecnología", "monto_mensual": 67.6, "nota": "USD 20 x S/3.38 (tipo de cambio BCRP 15-sep-2026)"}], "punto_equilibrio": [{"id": 1, "escenario": "Directo - Mantequilla de mani 150gr", "canal": "Directo", "producto": "Mantequilla de mani 150gr", "clave": "mani", "tramo": "PVP", "costos_fijos": 1137.6, "margen_pct": 0.7478, "venta_equilibrio_sin_igv": 1521.26, "venta_equilibrio_con_igv": 1521.26, "precio_unit_sin_igv": 23.0, "precio_unit_con_igv": 23.0, "unidades_equilibrio": 66.14, "unidades_por_dia": 2.54, "es_conservador": 0, "comentario": "Si todo se vendiera por canal directo a este producto (sin IGV, NRUS)."}, {"id": 2, "escenario": "Directo - Mantequilla Almendra 150gr", "canal": "Directo", "producto": "Mantequilla Almendra 150gr", "clave": "almendra", "tramo": "PVP", "costos_fijos": 1137.6, "margen_pct": 0.56, "venta_equilibrio_sin_igv": 2031.43, "venta_equilibrio_con_igv": 2031.43, "precio_unit_sin_igv": 25.0, "precio_unit_con_igv": 25.0, "unidades_equilibrio": 81.26, "unidades_por_dia": 3.13, "es_conservador": 0, "comentario": "Si todo se vendiera por canal directo a este producto (sin IGV, NRUS)."}, {"id": 3, "escenario": "Directo - Mantequilla de Chocomaní 150gr", "canal": "Directo", "producto": "Mantequilla de Chocomaní 150gr", "clave": "chocomani", "tramo": "PVP", "costos_fijos": 1137.6, "margen_pct": 0.7489, "venta_equilibrio_sin_igv": 1519.03, "venta_equilibrio_con_igv": 1519.03, "precio_unit_sin_igv": 23.5, "precio_unit_con_igv": 23.5, "unidades_equilibrio": 64.64, "unidades_por_dia": 2.49, "es_conservador": 0, "comentario": "Si todo se vendiera por canal directo a este producto (sin IGV, NRUS)."}, {"id": 4, "escenario": "Directo - Mantequilla Crunchi 150gr", "canal": "Directo", "producto": "Mantequilla Crunchi 150gr", "clave": "crunchy", "tramo": "PVP", "costos_fijos": 1137.6, "margen_pct": 0.7489, "venta_equilibrio_sin_igv": 1519.03, "venta_equilibrio_con_igv": 1519.03, "precio_unit_sin_igv": 23.5, "precio_unit_con_igv": 23.5, "unidades_equilibrio": 64.64, "unidades_por_dia": 2.49, "es_conservador": 0, "comentario": "Si todo se vendiera por canal directo a este producto (sin IGV, NRUS)."}, {"id": 5, "escenario": "Tiendas - Mantequilla de maní 150 g - Comercial", "canal": "Tiendas", "producto": "Mantequilla de maní 150 g", "clave": "mani", "tramo": "Comercial", "costos_fijos": 1137.6, "margen_pct": 0.5497, "venta_equilibrio_sin_igv": 2069.49, "venta_equilibrio_con_igv": 2442.0, "precio_unit_sin_igv": 12.88, "precio_unit_con_igv": 15.2, "unidades_equilibrio": 160.67, "unidades_por_dia": 6.18, "es_conservador": 0, "comentario": "Si todo se vendiera a tiendas en el tramo Comercial."}, {"id": 6, "escenario": "Tiendas - Mantequilla de maní 150 g - Exclusivo", "canal": "Tiendas", "producto": "Mantequilla de maní 150 g", "clave": "mani", "tramo": "Exclusivo", "costos_fijos": 1137.6, "margen_pct": 0.3996, "venta_equilibrio_sin_igv": 2846.85, "venta_equilibrio_con_igv": 3359.28, "precio_unit_sin_igv": 9.66, "precio_unit_con_igv": 11.4, "unidades_equilibrio": 294.7, "unidades_por_dia": 11.33, "es_conservador": 0, "comentario": "Si todo se vendiera a tiendas en el tramo Exclusivo."}, {"id": 7, "escenario": "Tiendas - Mantequilla de almendra 150 g - Comercial", "canal": "Tiendas", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "tramo": "Comercial", "costos_fijos": 1137.6, "margen_pct": 0.2984, "venta_equilibrio_sin_igv": 3812.33, "venta_equilibrio_con_igv": 4498.55, "precio_unit_sin_igv": 15.68, "precio_unit_con_igv": 18.5, "unidades_equilibrio": 243.13, "unidades_por_dia": 9.35, "es_conservador": 0, "comentario": "Si todo se vendiera a tiendas en el tramo Comercial."}, {"id": 8, "escenario": "Tiendas - Mantequilla de almendra 150 g - Exclusivo", "canal": "Tiendas", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "tramo": "Exclusivo", "costos_fijos": 1137.6, "margen_pct": 0.1516, "venta_equilibrio_sin_igv": 7503.96, "venta_equilibrio_con_igv": 8854.67, "precio_unit_sin_igv": 12.97, "precio_unit_con_igv": 15.3, "unidades_equilibrio": 578.56, "unidades_por_dia": 22.25, "es_conservador": 0, "comentario": "Si todo se vendiera a tiendas en el tramo Exclusivo."}, {"id": 9, "escenario": "Restaurantes - Balde 4 kg - Comercial", "canal": "Restaurantes", "producto": "Balde 4 kg", "clave": "balde4", "tramo": "Comercial", "costos_fijos": 1137.6, "margen_pct": 0.5901, "venta_equilibrio_sin_igv": 1927.81, "venta_equilibrio_con_igv": 2274.81, "precio_unit_sin_igv": 114.41, "precio_unit_con_igv": 135.0, "unidades_equilibrio": 16.85, "unidades_por_dia": 0.65, "es_conservador": 0, "comentario": "Si todo se vendiera a restaurantes en el tramo Comercial."}, {"id": 10, "escenario": "Restaurantes - Balde 4 kg - Exclusivo", "canal": "Restaurantes", "producto": "Balde 4 kg", "clave": "balde4", "tramo": "Exclusivo", "costos_fijos": 1137.6, "margen_pct": 0.4114, "venta_equilibrio_sin_igv": 2765.19, "venta_equilibrio_con_igv": 3262.93, "precio_unit_sin_igv": 79.66, "precio_unit_con_igv": 94.0, "unidades_equilibrio": 34.71, "unidades_por_dia": 1.34, "es_conservador": 0, "comentario": "Si todo se vendiera a restaurantes en el tramo Exclusivo."}, {"id": 11, "escenario": "CONSERVADOR (margen más bajo de toda la escala)", "canal": "Conservador", "producto": "Mantequilla de almendra 150 g", "clave": "almendra", "tramo": "Exclusivo", "costos_fijos": 1137.6, "margen_pct": 0.1516, "venta_equilibrio_sin_igv": 7503.96, "venta_equilibrio_con_igv": 8854.67, "precio_unit_sin_igv": 12.97, "precio_unit_con_igv": 15.3, "unidades_equilibrio": 578.56, "unidades_por_dia": 22.25, "es_conservador": 1, "comentario": "Piso de venta mensual que cubre los costos fijos aun si TODO se vendiera al margen más bajo (Mantequilla de almendra 150 g, tramo Exclusivo). Cualquier mezcla real necesita vender MENOS que esto."}], "issues": [{"id": 1, "severidad": "alta", "area": "Promociones", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "D9:E9", "descripcion": "La 'Promoción 2 mantequillas de almendra' sale a S/56.70, MÁS CARA que 2 frascos sueltos (S/50.00). El margen 61.2% no corresponde a una promoción.", "estado": "mitigado", "resolucion": "Propuesta: Pack almendra x2 a S/46 (8% de descuento, margen 52%). Ver promociones propuestas."}, {"id": 2, "severidad": "alta", "area": "Promociones", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "D10:E10", "descripcion": "La 'Promoción 3 almendras' tiene margen 23.25% (43% de descuento sobre 3 sueltas): casi no deja ganancia.", "estado": "mitigado", "resolucion": "Propuesta: Pack almendra x3 a S/66 (12% de descuento, margen 50%). Regla: ninguna promo baja de 50%."}, {"id": 3, "severidad": "alta", "area": "Escala B2B", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "D38:D41", "descripcion": "Almendra: el margen de Mr. Peanutt en la escala B2B es 30 / 22 / 19 / 15% y la tienda gana solo 26% al PVP de S/25. Con costo S/11 y PVP S/25 no hay espacio para dos intermediarios.", "estado": "mitigado", "resolucion": "Decisión del usuario: el PVP lo fija el canal directo (S/25) y la tienda revende a ese precio. Se mantienen los márgenes del Excel: la tienda gana 26% (Comercial) a 39% (Exclusivo). La almendra no aguanta un distribuidor intermedio: venderla por B2B solo en Comercial/Mayorista."}, {"id": 4, "severidad": "media", "area": "Escala B2B", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "A31:A32", "descripcion": "Tramos de tiendas con hueco: 'Pedidos menores a 500' y luego 'mayores a 700'. Un pedido de S/600 no cae en ningún tramo.", "estado": "mitigado", "resolucion": "Propuesta: Comercial = menos de S/700; Mayorista desde S/700."}, {"id": 5, "severidad": "media", "area": "Escala B2B", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "A24:B24 / H24", "descripcion": "El tramo Comercial del balde no tiene condición, y la celda de 'Unidades mínimas' quedó como fecha (01/02/2026): probablemente se escribió '1-2'.", "estado": "mitigado", "resolucion": "Propuesta: tramos del balde por cantidad (1-3 / 4-6 / 7-9 / 10+)."}, {"id": 6, "severidad": "media", "area": "Escala B2B", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "H25:H27", "descripcion": "Las unidades mínimas se calculan dividiendo el umbral entre el precio SIN IGV del mismo tramo (circular y sin IGV): 4.09 baldes para S/400, cuando el cliente paga con IGV.", "estado": "mitigado", "resolucion": "Propuesta: umbrales sobre el total del pedido con IGV y redondeados a unidades enteras (A2)."}, {"id": 7, "severidad": "media", "area": "Canal directo", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "E3:E6", "descripcion": "El precio de lista del canal directo no separa el IGV.", "estado": "resuelto", "resolucion": "Decisión del usuario (2026-09-18): el canal directo está en NRUS y no cobra IGV, así que el PVP es precio neto y el margen del Excel es el real (maní 74.8%, almendra 56.0% con el PVP redondeado). Supuesto A1."}, {"id": 9, "severidad": "media", "area": "Escala B2B", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "D31", "descripcion": "Tramo Comercial del maní: la tienda gana 28.1% al PVP, por debajo del 30% que suele pedir el retail.", "estado": "mitigado", "resolucion": "Propuesta: margen Comercial 55% -> precio S/15.20 con IGV -> la tienda gana 33.9%."}, {"id": 10, "severidad": "media", "area": "Combos", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "L14:O19", "descripcion": "El 'Combo 3 mantequillas' (S/39.82) no dice si es sin IGV ni a qué canal pertenece (está bajo CANAL B2B).", "estado": "pendiente", "resolucion": "Confirmar canal y si el precio lleva IGV. Con IGV sería S/46.99."}, {"id": 8, "severidad": "baja", "area": "Tributario", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "-", "descripcion": "El canal directo está en NRUS (sin IGV), pero la escala B2B del Excel cotiza precios con IGV: en NRUS no se emiten facturas, y las tiendas y restaurantes suelen pedir factura para usar el crédito fiscal.", "estado": "pendiente", "resolucion": "Confirmar con el contador si las ventas B2B se facturan desde otro RUC/régimen o si se venden con boleta."}, {"id": 11, "severidad": "baja", "area": "Escala B2B", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "-", "descripcion": "Chocomaní y Crunchy no tienen escala B2B en el Excel.", "estado": "resuelto", "resolucion": "Decisión del usuario (2026-09-18): por B2B solo van maní y almendra; chocomaní y crunchy se venden únicamente por el canal directo. Supuesto A3."}, {"id": 12, "severidad": "baja", "area": "Costeo", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "E15:F16", "descripcion": "El balde de 1 kg solo tiene el costo del envase (S/3.00); falta mantequilla y etiqueta.", "estado": "mitigado", "resolucion": "Propuesta: S/3.00 + 1 kg x S/10 + etiqueta S/1.70 = S/14.70. Supuesto A4."}, {"id": 13, "severidad": "baja", "area": "Costeo", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "I7:J7", "descripcion": "Las celdas I7 (=H7/5 = 8) y J7 (10.2) no se usan en ninguna fórmula; parecen un tanteo del costo de la almendra.", "estado": "pendiente", "resolucion": "Confirmar si el costo S/11 del frasco de almendra ya incluye envase y mano de obra."}, {"id": 14, "severidad": "baja", "area": "Punto de equilibrio", "archivo": "Hoja de cálculo sin título.xlsx", "hoja": "Hoja 1", "celda": "-", "descripcion": "No hay costos fijos mensuales en el Excel, así que no se podía calcular el punto de equilibrio de Mr. Peanutt.", "estado": "resuelto", "resolucion": "Decisión del usuario (2026-09-18): sueldo S/1,020 + NRUS S/50 (tope) + Cloud USD 20 = S/1,137.60/mes. Se calcula el PE por escenario y el conservador con el margen más bajo (tabla punto_equilibrio)."}], "recomendaciones": [{"id": 1, "prioridad": 1, "area": "Tiendas", "recomendacion": "El canal directo fija el precio de mercado: PVP maní S/23.00, chocomaní/crunchy S/23.50, almendra S/25.00. Exigirlo a las tiendas como precio mínimo de reventa para que el canal directo y las tiendas no se pisen.", "impacto": "Protege el margen del canal directo y da a la tienda un margen conocido (34-50%)."}, {"id": 2, "prioridad": 2, "area": "Tiendas", "recomendacion": "Escala de 4 tramos por pedido con IGV, sin huecos: Comercial < S/700, Mayorista desde S/700, Distribuidor desde S/1,000, Exclusivo desde S/1,600. Precios con IGV redondeados a S/0.10.", "impacto": "Mr. Peanutt gana 55 / 50 / 45 / 40% en maní; la tienda gana 33.9% comprando Comercial (S/15.20)."}, {"id": 3, "prioridad": 3, "area": "Almendra", "recomendacion": "Con PVP fijo en S/25 y costo S/11, ofrecer la almendra a tiendas solo en Comercial (S/18.50) y Mayorista (S/16.60); no darle tramo Distribuidor/Exclusivo (dejan 19% y 15% a Mr. Peanutt).", "impacto": "La tienda gana 26-34% y Mr. Peanutt no baja de 22%. Si baja el costo de la almendra, se revisa."}, {"id": 4, "prioridad": 4, "area": "Restaurantes", "recomendacion": "Vender el balde de 4 kg por cantidad (1-3 / 4-6 / 7-9 / 10+ baldes): S/135 / S/115 / S/102 / S/94 con IGV. Comunicar el costo por porción de 30 g (S/1.01 -> S/0.70), no el descuento.", "impacto": "Margen Mr. Peanutt 59 -> 41%; el restaurante paga ~70-77% menos por kg que en frasco."}, {"id": 5, "prioridad": 5, "area": "Restaurantes", "recomendacion": "Lanzar el balde de 1 kg (costo propuesto S/14.70) con la misma escala: S/42 / S/36 / S/32 / S/29 con IGV.", "impacto": "Formato de entrada para cafeterías chicas; S/42/kg vs S/33.75/kg del balde de 4 kg."}, {"id": 6, "prioridad": 6, "area": "Promociones", "recomendacion": "Mecánica 'arma tu pack' con precio fijo por cantidad: 2 frascos S/42, 3 frascos S/51, 4 frascos S/64 (elige sabores, máx. 1 almendra, se puede repetir); packs de solo almendra 2 por S/46 y 3 por S/66. Pack 3 y 4 fijados al 55% de margen sobre la peor mezcla (con 50% serían S/46 y S/57). El suelto no se descuenta nunca; se comunica el ahorro en soles, no el porcentaje.", "impacto": "Pack 3: cliente ahorra S/18-21 (26-29%), margen 55-66%. Pack 4: ahorra S/28-32 (30-33%), margen 55-64%. Ojo: S/17 y S/16 por frasco ya se acercan a lo que paga la tienda (S/15.20)."}, {"id": 7, "prioridad": 7, "area": "Control", "recomendacion": "Con costos fijos de S/1,138/mes, el punto de equilibrio conservador (margen más bajo de la escala, 15.2%) es S/8,855/mes con IGV. Revisar cada mes si la venta B2B supera ese piso; si se vende más por canal directo, el piso baja.", "impacto": "Vendiendo solo por canal directo el equilibrio baja a S/1,521/mes con IGV (66 frascos)."}, {"id": 8, "prioridad": 8, "area": "Control", "recomendacion": "Regla para distribuidores: quien compra en Distribuidor/Exclusivo debe revender a tiendas al precio Comercial (no por debajo) y al público al PVP sugerido.", "impacto": "Mantiene los ~25% del distribuidor y los 30%+ de la tienda sin canibalizar el canal directo."}], "meta": {"generado": "2026-09-18T20:00:01", "excel_origen": "F:\\TRABAJOS CLAUDE\\MR.PEANUTT\\CENTRO DE COSTOS\\DATOS INICIALES\\Hoja de cálculo sin título.xlsx", "igv": "0.18", "canal_directo_igv": "0", "porcion_gr": "30", "margen_tienda_minimo": "0.3"}, "kpis": {"n_productos": 6, "costos_fijos_total": 1137.6, "pe_conservador_sin_igv": 7503.96, "pe_conservador_con_igv": 8854.67, "pe_conservador_margen": 0.1516, "pe_conservador_unidades": 578.56, "pe_directo_mani_con_igv": 1521.26, "pe_directo_mani_unidades": 66.14, "margen_directo_min": 0.56, "margen_directo_max": 0.7489, "promos_margen_min": 0.5, "promos_margen_max": 0.7238, "margen_tiendas_excel_min": 0.15, "margen_tiendas_excel_max": 0.586, "margen_tienda_excel_min": 0.2583, "margen_tienda_excel_max": 0.5041, "margen_tiendas_prop_min": 0.1516, "margen_tiendas_prop_max": 0.5497, "margen_tienda_prop_min": 0.26, "margen_tienda_prop_max": 0.5043, "margen_restaurantes_min": 0.4114, "margen_restaurantes_max": 0.5901, "balde4_precio_kg_min": 23.5, "balde4_precio_kg_max": 33.75, "margen_conservador": 0.1516, "margen_conservador_origen": "Mantequilla de almendra 150 g · Exclusivo", "issues_alta": 3, "issues_media": 6, "issues_baja": 5, "issues_total": 14, "issues_pendientes": 3}};
+
+  const fmtS = (n) => n == null ? '—' : 'S/ ' + Number(n).toLocaleString('es-PE', {maximumFractionDigits: 0});
+  const fmtS2 = (n) => n == null ? '—' : 'S/ ' + Number(n).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const fmtPct = (n) => n == null ? '—' : (Number(n) * 100).toLocaleString('es-PE', {maximumFractionDigits: 1}) + '%';
+  const fmtN = (n, d = 0) => n == null ? '—' : Number(n).toLocaleString('es-PE', {maximumFractionDigits: d});
+  const esc = (s) => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const IGV = 1.18;
+
+  document.getElementById('cc-generated').textContent =
+    'Generado ' + new Date().toLocaleDateString('es-PE', {year:'numeric', month:'long', day:'numeric'});
+
+  // ---------------- Tabs ----------------
+  const tabs = Array.from(document.querySelectorAll('.cc-tab'));
+  const panels = {};
+  tabs.forEach(t => { panels[t.dataset.tab] = document.getElementById('panel-' + t.dataset.tab); });
+  function selectTab(name, opts) {
+    if (!panels[name]) name = 'resumen';
+    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    Object.entries(panels).forEach(([k, el]) => { el.hidden = k !== name; });
+    const tabBtn = tabs.find(t => t.dataset.tab === name);
+    document.title = 'Mr. Peanutt · Centro de Costos' + (tabBtn ? ' · ' + tabBtn.textContent.trim() : '');
+    if (!(opts && opts.silent)) {
+      try { if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name); } catch (e) {}
+      try { localStorage.setItem('mp-cc-tab', name); } catch (e) {}
+    }
+  }
+  tabs.forEach(t => t.addEventListener('click', () => selectTab(t.dataset.tab)));
+  (function () {
+    let inicial = (location.hash || '').replace('#', '');
+    if (!panels[inicial]) { try { inicial = localStorage.getItem('mp-cc-tab') || ''; } catch (e) {} }
+    selectTab(panels[inicial] ? inicial : 'resumen');
+    window.addEventListener('hashchange', () => { const h = (location.hash || '').replace('#', ''); if (panels[h]) selectTab(h, {silent: true}); });
+  })();
+  document.getElementById('cc-print-btn').addEventListener('click', () => window.print());
+
+  // ---------------- helpers ----------------
+  function pintarKpis(id, lista, cols) {
+    const el = document.getElementById(id);
+    el.innerHTML = lista.map(kk => `
+    <div class="cc-kpi ${kk.accent ? 'is-accent' : ''}">
+      <div class="cc-kpi-label">${kk.label}</div>
+      <div class="cc-kpi-value">${kk.value}</div>
+      ${kk.sub ? `<div class="cc-kpi-sub">${kk.sub}</div>` : ''}
+    </div>`).join('');
+  }
+  // cols: [{k, label, fmt, num, cls, render}]
+  function tabla(id, cols, rows, opts = {}) {
+    const el = document.getElementById(id);
+    const th = cols.map(c => `<th class="${c.num ? 'num' : ''} ${c.cls === 'center' ? 'center' : ''}">${c.label}</th>`).join('');
+    const tr = rows.map(r => {
+      const cls = opts.rowClass ? opts.rowClass(r) : '';
+      if (r.__group) return `<tr class="is-group"><td colspan="${cols.length}">${esc(r.__group)}</td></tr>`;
+      return `<tr class="${cls}">` + cols.map(c => {
+        let v = c.render ? c.render(r) : (c.fmt ? c.fmt(r[c.k]) : esc(r[c.k]));
+        return `<td class="${c.num ? 'num' : ''} ${c.cls || ''}">${v == null ? '—' : v}</td>`;
+      }).join('') + '</tr>';
+    }).join('');
+    el.innerHTML = `<table class="cc-table ${opts.compact ? 'cc-table--compact' : ''} ${opts.fixed ? 'cc-table--fixed' : ''}"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table>`;
+  }
+  const semaforo = (s) => s === 'ok' ? '<span class="cc-badge cc-badge-good">≥ 30%</span>'
+    : s === 'ajustado' ? '<span class="cc-badge cc-badge-warn">ajustado</span>'
+    : s === 'bajo' ? '<span class="cc-badge cc-badge-crit">bajo</span>' : '';
+  const badgeTienda = (m) => m == null ? '—' : (m >= 0.30 ? `<span class="cc-badge cc-badge-good">${fmtPct(m)}</span>` : m >= 0.25 ? `<span class="cc-badge cc-badge-warn">${fmtPct(m)}</span>` : `<span class="cc-badge cc-badge-crit">${fmtPct(m)}</span>`);
+  const sevColor = (s) => s === 'alta' ? 'var(--critical)' : s === 'media' ? 'var(--warning)' : 'var(--s4)';
+  const estadoBadge = (e) => e === 'resuelto' ? '<span class="cc-badge cc-badge-good">resuelto</span>' : e === 'mitigado' ? '<span class="cc-badge cc-badge-warn">mitigado</span>' : '<span class="cc-badge cc-badge-crit">pendiente</span>';
+
+  const K = DATA.kpis;
+  const PROP = DATA.escala_b2b_propuesta;
+  const EXC = DATA.escala_b2b_excel;
+  const tiendasProp = PROP.filter(p => p.segmento === 'TIENDAS');
+  const tiendasExcel = EXC.filter(p => p.segmento === 'TIENDAS');
+  const baldesProp = PROP.filter(p => p.segmento === 'RESTAURANTES');
+  const baldesExcel = EXC.filter(p => p.segmento === 'RESTAURANTES');
+
+  // ================= RESUMEN =================
+  pintarKpis('cc-res-kpis', [
+    {label: 'Costos fijos / mes', value: fmtS2(K.costos_fijos_total), sub: 'sueldo + NRUS + Cloud'},
+    {label: 'Equilibrio conservador', value: fmtS(K.pe_conservador_con_igv), sub: `con IGV · margen ${fmtPct(K.pe_conservador_margen)}`, accent: true},
+    {label: 'Equilibrio solo directo (maní)', value: fmtS(K.pe_directo_mani_con_igv), sub: `${fmtN(K.pe_directo_mani_unidades)} frascos / mes`},
+    {label: 'Gana la tienda (propuesta)', value: `${fmtPct(K.margen_tienda_prop_min)} – ${fmtPct(K.margen_tienda_prop_max)}`, sub: `Excel: ${fmtPct(K.margen_tienda_excel_min)} – ${fmtPct(K.margen_tienda_excel_max)}`},
+    {label: 'Hallazgos pendientes', value: String(K.issues_pendientes), sub: `${K.issues_alta} alta · ${K.issues_media} media · ${K.issues_baja} baja`},
+  ]);
+
+  // Tabla ¿cuánto gana la tienda? (Excel vs propuesta, por producto y tramo)
+  {
+    const rows = [];
+    for (const clave of ['mani', 'almendra']) {
+      const nombre = tiendasProp.find(p => p.clave === clave).producto;
+      rows.push({__group: nombre});
+      for (let t = 1; t <= 4; t++) {
+        const p = tiendasProp.find(x => x.clave === clave && x.tramo === t);
+        const e = tiendasExcel.find(x => x.producto.toLowerCase().includes(clave === 'mani' ? 'maní' : 'almendra') && x.tramo === t);
+        rows.push({tramo: `${t} · ${p.nombre_tramo}<span class="cc-sub">${esc(p.condicion)}</span>`,
+          e_precio: e && e.precio_con_igv, e_mp: e && e.margen_mrpeanutt_pct, e_pvp: e && e.pvp_referencia, e_tienda: e && e.margen_tienda_pct,
+          p_precio: p.precio_con_igv, p_mp: p.margen_mrpeanutt_pct, p_pvp: p.pvp_sugerido, p_tienda: p.margen_tienda_pct});
+      }
+    }
+    tabla('cc-res-tienda', [
+      {k: 'tramo', label: 'Tramo (condición propuesta)', render: r => r.tramo},
+      {k: 'e_precio', label: 'Excel · precio tienda (c/IGV)', fmt: fmtS2, num: true},
+      {k: 'e_mp', label: 'Excel · margen Mr. Peanutt', fmt: fmtPct, num: true},
+      {k: 'e_tienda', label: 'Excel · gana la tienda', cls: 'center', render: r => badgeTienda(r.e_tienda)},
+      {k: 'p_precio', label: 'Propuesta · precio tienda (c/IGV)', fmt: fmtS2, num: true},
+      {k: 'p_mp', label: 'Propuesta · margen Mr. Peanutt', fmt: fmtPct, num: true},
+      {k: 'p_pvp', label: 'PVP sugerido', fmt: fmtS2, num: true},
+      {k: 'p_tienda', label: 'Propuesta · gana la tienda', cls: 'center', render: r => badgeTienda(r.p_tienda)},
+    ], rows, {compact: true, fixed: true});
+  }
+
+  // Barras: margen Mr. Peanutt por canal
+  {
+    const filas = [];
+    DATA.canal_directo.forEach(d => filas.push({label: 'Directo · ' + d.producto, sub: 'PVP ' + fmtS2(d.pvp_redondeado) + ' · sin IGV', v: d.margen_pct, color: 'var(--s1)'}));
+    tiendasProp.forEach(p => filas.push({label: `Tiendas · ${p.producto.replace('Mantequilla de ', '')}`, sub: `${p.nombre_tramo} · ${fmtS2(p.precio_con_igv)}`, v: p.margen_mrpeanutt_pct, color: 'var(--s2)'}));
+    baldesProp.filter(p => p.clave === 'balde4').forEach(p => filas.push({label: 'Restaurantes · Balde 4 kg', sub: `${p.nombre_tramo} · ${fmtS2(p.precio_con_igv)}`, v: p.margen_mrpeanutt_pct, color: 'var(--s3)'}));
+    const max = 0.8;
+    document.getElementById('cc-res-barras').innerHTML = filas.map(f => `
+      <div class="cc-bar-row">
+        <div class="cc-bar-label">${esc(f.label)}<small>${esc(f.sub)}</small></div>
+        <div class="cc-bar-track"><div class="cc-bar-fill" style="width:${(f.v / max * 100).toFixed(1)}%;background:${f.color}"></div><div class="cc-bar-marker" style="left:${(K.margen_conservador / max * 100).toFixed(1)}%"></div></div>
+        <div class="cc-bar-value">${fmtPct(f.v)}</div>
+      </div>`).join('') + `<div class="cc-legend"><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s1)"></i>Canal directo</span><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s2)"></i>Tiendas (propuesta)</span><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s3)"></i>Restaurantes (propuesta)</span><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--critical)"></i>Margen más bajo: ${fmtPct(K.margen_conservador)} (${esc(K.margen_conservador_origen)})</span></div>`;
+  }
+
+  function pintarIssues(id, lista) {
+    document.getElementById(id).innerHTML = lista.length ? lista.map(i => `
+      <div class="cc-alert" style="--sev-color:${sevColor(i.severidad)}">
+        <div class="cc-alert-bar"></div>
+        <div class="cc-alert-body">
+          <div class="cc-alert-top"><span class="cc-chip">${esc(i.severidad)}</span>${estadoBadge(i.estado)}<span class="cc-alert-area">${esc(i.area)}</span></div>
+          <p class="cc-alert-desc">${esc(i.descripcion)}</p>
+          ${i.resolucion ? `<div class="cc-alert-res"><strong>${i.estado === 'pendiente' ? 'Sugerido' : 'Resolución'}:</strong> ${esc(i.resolucion)}</div>` : ''}
+          <div class="cc-alert-src">${esc(i.archivo)} · ${esc(i.hoja)} · ${esc(i.celda)}</div>
+        </div>
+      </div>`).join('') : '<p class="cc-mini-note">Sin alertas pendientes.</p>';
+  }
+  pintarIssues('cc-res-alertas', DATA.issues.filter(i => i.estado === 'pendiente'));
+
+  // ================= PRODUCTOS =================
+  tabla('cc-prod-tabla', [
+    {k: 'producto', label: 'Producto'}, {k: 'familia', label: 'Familia'}, {k: 'presentacion', label: 'Presentación'},
+    {k: 'costo_unitario', label: 'Costo unitario', fmt: fmtS2, num: true},
+    {k: 'costo_por_kg', label: 'Costo por kg', fmt: fmtS2, num: true},
+    {k: 'costo_insumo_principal_est', label: 'Insumo principal (est.)', fmt: fmtS2, num: true},
+    {k: 'costo_envase_y_otros_est', label: 'Envase + etiqueta + otros (est.)', fmt: fmtS2, num: true},
+    {k: 'estado', label: 'Estado', render: r => r.estado === 'Excel' ? '<span class="cc-badge cc-badge-muted">Excel</span>' : `<span class="cc-badge cc-badge-warn">${esc(r.estado)}</span>`},
+    {k: 'fuente', label: 'Fuente', cls: 'wrap'},
+  ], DATA.productos_costeo);
+  {
+    const grupos = {};
+    DATA.costeo_balde_detalle.forEach(d => { (grupos[d.producto] = grupos[d.producto] || []).push(d); });
+    document.getElementById('cc-prod-baldes').innerHTML = Object.entries(grupos).map(([nombre, det]) => `
+      <div class="cc-product-card">
+        <div class="cc-product-name">${esc(nombre)} ${det.some(d => d.estado.startsWith('Propuesto')) ? '<span class="cc-badge cc-badge-warn">propuesto</span>' : '<span class="cc-badge cc-badge-muted">Excel</span>'}</div>
+        ${det.map(d => `<div class="cc-product-row" ${d.componente === 'COSTO TOTAL' ? 'style="font-weight:700"' : ''}><span class="k">${esc(d.componente)}${d.cantidad ? ` <small>(${fmtN(d.cantidad)} ${esc(d.unidad)} × ${fmtS2(d.costo_unitario)})</small>` : ''}</span><span class="v">${fmtS2(d.costo_total)}</span></div>`).join('')}
+      </div>`).join('');
+  }
+  tabla('cc-prod-params', [
+    {k: 'descripcion', label: 'Parámetro', cls: 'wrap'},
+    {k: 'valor', label: 'Valor', num: true, render: r => r.unidad === '%' ? fmtPct(r.valor) : (r.unidad || '').startsWith('S/') ? fmtS2(r.valor) : fmtN(r.valor, 2)},
+    {k: 'unidad', label: 'Unidad'}, {k: 'fuente', label: 'Fuente'}, {k: 'nota', label: 'Nota', cls: 'wrap'},
+  ], DATA.parametros);
+
+  // ================= CANAL DIRECTO =================
+  tabla('cc-dir-tabla', [
+    {k: 'producto', label: 'Producto'},
+    {k: 'costo', label: 'Costo', fmt: fmtS2, num: true},
+    {k: 'margen_excel_pct', label: 'Margen Excel', fmt: fmtPct, num: true},
+    {k: 'precio_lista', label: 'Precio lista Excel', fmt: fmtS2, num: true},
+    {k: 'pvp_redondeado', label: 'PVP (sin IGV)', fmt: fmtS2, num: true},
+    {k: 'ganancia_unit', label: 'Gana Mr. Peanutt / frasco', fmt: fmtS2, num: true},
+    {k: 'margen_pct', label: 'Margen sobre el PVP', fmt: fmtPct, num: true},
+    {k: 'precio_por_kg', label: 'PVP por kg', fmt: fmtS2, num: true},
+  ], DATA.canal_directo);
+  tabla('cc-dir-promos', [
+    {k: 'promocion', label: 'Promoción', cls: 'wrap'}, {k: 'canal', label: 'Canal', cls: 'wrap'}, {k: 'composicion', label: 'Composición', cls: 'wrap'},
+    {k: 'costo', label: 'Costo', fmt: fmtS2, num: true},
+    {k: 'margen_excel_pct', label: 'Margen Excel', fmt: fmtPct, num: true},
+    {k: 'precio_excel', label: 'Precio Excel', fmt: fmtS2, num: true},
+    {k: 'suma_precios_individuales', label: 'Suma sueltos (PVP)', fmt: fmtS2, num: true},
+    {k: 'descuento_vs_individual_pct', label: 'Descuento real', num: true, render: r => (r.descuento_vs_individual_pct < 0 || r.descuento_vs_individual_pct > 0.15) ? `<span class="cc-badge cc-badge-crit">${fmtPct(r.descuento_vs_individual_pct)}</span>` : fmtPct(r.descuento_vs_individual_pct)},
+    {k: 'ganancia_unit', label: 'Ganancia / pack', fmt: fmtS2, num: true},
+    {k: 'observacion', label: 'Observación', cls: 'wrap'},
+  ], DATA.promociones, {compact: true});
+
+  // ---- Packs propuestos
+  {
+    const PK = DATA.promociones_propuesta;
+    const rg = (a, b, f) => a === b ? f(a) : `${f(a)} a ${f(b)}`;
+    pintarKpis('cc-packs-kpis', PK.map(p => ({
+      label: `${p.pack} · ${p.n_frascos} frascos${p.pack.includes('almendra') ? ' · solo almendra' : ''}`, value: fmtS2(p.precio_pack),
+      sub: `${fmtS2(p.precio_por_frasco)} por frasco · ahorras ${rg(p.ahorro_min, p.ahorro_max, fmtS2)} · margen ${rg(p.margen_min_pct, p.margen_max_pct, fmtPct)}`,
+      accent: p.n_frascos === 3 && !p.pack.includes('almendra'),
+    })));
+    const rango = (a, b, f) => a === b ? f(a) : `${f(a)} – ${f(b)}`;
+    tabla('cc-dir-packs', [
+      {k: 'pack', label: 'Pack', render: r => `<strong>${esc(r.pack)}</strong><span class="cc-sub">${esc(r.regla)}</span>`},
+      {k: 'precio_pack', label: 'Precio fijo', num: true, render: r => `<strong>${fmtS2(r.precio_pack)}</strong>`},
+      {k: 'precio_por_frasco', label: 'Por frasco', fmt: fmtS2, num: true},
+      {k: 'combos_posibles', label: 'Mezclas posibles', num: true, fmt: v => fmtN(v)},
+      {k: 'sueltos', label: 'Sueltos al PVP', num: true, render: r => rango(r.sueltos_min, r.sueltos_max, fmtS2)},
+      {k: 'ahorro', label: 'Ahorro del cliente', num: true, render: r => `${rango(r.ahorro_min, r.ahorro_max, fmtS2)}<span class="cc-sub">${rango(r.descuento_min_pct, r.descuento_max_pct, fmtPct)}</span>`},
+      {k: 'margen', label: 'Margen Mr. Peanutt', cls: 'center', render: r => `<span class="cc-badge ${r.margen_min_pct >= 0.5 ? 'cc-badge-good' : 'cc-badge-crit'}">${rango(r.margen_min_pct, r.margen_max_pct, fmtPct)}</span>`},
+      {k: 'ganancia', label: 'Ganancia / pack', num: true, render: r => rango(r.ganancia_min, r.ganancia_max, fmtS2)},
+      {k: 'mezcla_peor_margen', label: 'Peor mezcla (margen)', cls: 'wrap'},
+      {k: 'ejemplo', label: 'Cómo comunicarlo', cls: 'wrap', render: r => `"${esc(r.ejemplo)} por ${fmtS2(r.precio_pack)}: ahorras ${fmtS2(r.ejemplo_ahorro)}"`},
+    ], PK, {compact: true, rowClass: r => r.n_frascos === 3 && !r.pack.includes('almendra') ? 'is-highlight' : ''});
+    const out = []; let last = null;
+    DATA.promociones_ejemplos.forEach(r => { if (r.pack !== last) { out.push({__group: `${r.pack} — ${fmtS2(r.precio_pack)}`}); last = r.pack; } out.push(r); });
+    tabla('cc-dir-packs-mezclas', [
+      {k: 'mezcla', label: 'Mezcla'},
+      {k: 'costo', label: 'Costo', fmt: fmtS2, num: true},
+      {k: 'sueltos', label: 'Sueltos', fmt: fmtS2, num: true},
+      {k: 'ahorro', label: 'Ahorro', num: true, render: r => `${fmtS2(r.ahorro)} (${fmtPct(r.descuento_pct)})`},
+      {k: 'ganancia', label: 'Ganancia', fmt: fmtS2, num: true},
+      {k: 'ganancia_cedida', label: 'Cedida', fmt: fmtS2, num: true},
+      {k: 'margen_pct', label: 'Margen', cls: 'center', render: r => `<span class="cc-badge ${r.margen_pct >= 0.5 ? 'cc-badge-good' : 'cc-badge-crit'}">${fmtPct(r.margen_pct)}</span>`},
+    ], out, {compact: true});
+    // ---- Escenarios de margen + control en vivo
+    {
+      const ESC = DATA.packs_escenarios;
+      const pTienda = ESC.length ? ESC[0].precio_tienda_comercial : null;
+      document.getElementById('pk-tienda').textContent = pTienda != null ? Number(pTienda).toFixed(2) : '—';
+      const out = []; let last = null;
+      ESC.forEach(r => { if (r.pack !== last) { out.push({__group: `${r.pack} — peor mezcla cuesta ${fmtS2(r.costo_peor_mezcla)}`}); last = r.pack; } out.push(r); });
+      tabla('cc-dir-packs-esc', [
+        {k: 'margen_objetivo_pct', label: 'Margen objetivo', num: true, fmt: fmtPct},
+        {k: 'precio_pack', label: 'Precio del pack', num: true, render: r => `<strong>${fmtS2(r.precio_pack)}</strong>`},
+        {k: 'precio_por_frasco', label: 'Por frasco', fmt: fmtS2, num: true},
+        {k: 'ahorro', label: 'Ahorro del cliente', num: true, render: r => `${fmtS2(r.ahorro_min)} – ${fmtS2(r.ahorro_max)}<span class="cc-sub">${fmtPct(r.descuento_min_pct)} – ${fmtPct(r.descuento_max_pct)}</span>`},
+        {k: 'margen', label: 'Margen real (peor – mejor mezcla)', cls: 'center', render: r => `<span class="cc-badge ${r.margen_min_pct >= 0.5 ? 'cc-badge-good' : 'cc-badge-crit'}">${fmtPct(r.margen_min_pct)} – ${fmtPct(r.margen_max_pct)}</span>`},
+        {k: 'sobre_precio_tienda_pct', label: 'Frasco vs. precio tienda Comercial', cls: 'center', render: r => r.sobre_precio_tienda_pct < 0 ? `<span class="cc-badge cc-badge-crit">${fmtPct(r.sobre_precio_tienda_pct)} · por debajo</span>` : r.sobre_precio_tienda_pct < 0.10 ? `<span class="cc-badge cc-badge-warn">+${fmtPct(r.sobre_precio_tienda_pct)} · al límite</span>` : `<span class="cc-badge cc-badge-good">+${fmtPct(r.sobre_precio_tienda_pct)}</span>`},
+      ], out, {compact: true, rowClass: r => r.es_propuesto ? 'is-highlight' : ''});
+
+      // Control en vivo: recalcula con los costos y PVP de canal_directo
+      const CD = Object.fromEntries(DATA.canal_directo.map(d => [d.clave, d]));
+      const PACKS_LIVE = [
+        {n: 2, label: 'Pack 2 · 2 frascos', peor: {chocomani: 1, almendra: 1}, mejor: {mani: 2}, accent: false},
+        {n: 3, label: 'Pack 3 · 3 frascos', peor: {chocomani: 2, almendra: 1}, mejor: {mani: 3}, accent: true},
+        {n: 4, label: 'Pack 4 · 4 frascos', peor: {chocomani: 3, almendra: 1}, mejor: {mani: 4}, accent: false},
+        {n: 2, label: 'Pack almendra x2', peor: {almendra: 2}, mejor: {almendra: 2}, accent: false},
+        {n: 3, label: 'Pack almendra x3', peor: {almendra: 3}, mejor: {almendra: 3}, accent: false},
+      ];
+      const suma = (mix, k) => Object.entries(mix).reduce((a, [c, n]) => a + n * CD[c][k], 0);
+      const sl = document.getElementById('pk-m');
+      function renderPk() {
+        const m = Number(sl.value) / 100;
+        document.getElementById('pk-m-txt').textContent = '· ' + fmtPct(m);
+        const cards = []; const avisos = [];
+        PACKS_LIVE.forEach(pk => {
+          const n = pk.n;
+          const cPeor = suma(pk.peor, 'costo'), cMejor = suma(pk.mejor, 'costo');
+          const price = Math.round(cPeor / (1 - m));
+          const porFrasco = price / n;
+          const mMin = (price - cPeor) / price, mMax = (price - cMejor) / price;
+          // sueltos: la mezcla más barata (mejor) y la más cara (peor) al PVP
+          const sueltosMin = suma(pk.mejor, 'pvp_redondeado'), sueltosMax = suma(pk.peor, 'pvp_redondeado');
+          const esAlm = pk.label.includes('almendra');
+          const refTienda = esAlm ? (tiendasProp.find(x => x.clave === 'almendra' && x.tramo === 1) || {}).precio_con_igv : pTienda;
+          const sobre = refTienda ? porFrasco / refTienda - 1 : null;
+          const ah = sueltosMin === sueltosMax ? fmtS2(sueltosMin - price) : `${fmtS2(sueltosMin - price)}–${fmtS2(sueltosMax - price)}`;
+          const dt = sueltosMin === sueltosMax ? fmtPct(1 - price / sueltosMin) : `${fmtPct(1 - price / sueltosMin)}–${fmtPct(1 - price / sueltosMax)}`;
+          const mg = cPeor === cMejor ? fmtPct(mMin) : `${fmtPct(mMin)}–${fmtPct(mMax)}`;
+          cards.push({label: pk.label, value: fmtS2(price), accent: pk.accent,
+            sub: `${fmtS2(porFrasco)} por frasco · ahorra ${ah} (${dt}) · margen ${mg}`});
+          if (sueltosMin - price <= 0) avisos.push(`${pk.label}: a ${fmtS2(price)} no hay descuento frente a los sueltos (${fmtS2(sueltosMin)}).`);
+          else if (sobre != null && sobre < 0) avisos.push(`${pk.label}: S/${porFrasco.toFixed(2)} por frasco queda POR DEBAJO de lo que paga la tienda (S/${Number(refTienda).toFixed(2)}).`);
+          else if (sobre != null && sobre < 0.10) avisos.push(`${pk.label}: S/${porFrasco.toFixed(2)} por frasco está a solo ${fmtPct(sobre)} de lo que paga la tienda (S/${Number(refTienda).toFixed(2)}).`);
+        });
+        pintarKpis('pk-cards', cards);
+        const vd = document.getElementById('pk-verdict');
+        if (m < 0.5) { vd.className = 'cc-sim-verdict is-bad'; vd.textContent = `Por debajo del piso de 50%: con ${fmtPct(m)} en la peor mezcla la promo regala margen. ` + avisos.join(' '); }
+        else if (avisos.length) { vd.className = 'cc-sim-verdict is-warn'; vd.textContent = avisos.join(' ') + ' Riesgo de conflicto con el canal de tiendas.'; }
+        else { vd.className = 'cc-sim-verdict is-good'; vd.textContent = `Margen ${fmtPct(m)} en la peor mezcla y el precio por frasco sigue por encima de lo que paga la tienda.`; }
+      }
+      sl.addEventListener('input', renderPk);
+      renderPk();
+    }
+
+    tabla('cc-dir-terminos', [
+      {k: 'orden', label: '#', num: true},
+      {k: 'termino', label: 'Término', cls: 'wrap', render: r => `<strong>${esc(r.termino)}</strong>`},
+      {k: 'por_que', label: 'Por qué', cls: 'wrap'},
+    ], DATA.promociones_terminos);
+  }
+
+  // ---- Armador de promociones
+  {
+    const NOMBRE = {mani: 'Maní', almendra: 'Almendra', chocomani: 'Chocomaní', crunchy: 'Crunchy'};
+    const prods = DATA.canal_directo.map(d => ({clave: d.clave, nombre: NOMBRE[d.clave] || d.producto, costo: d.costo, pvp: d.pvp_redondeado}));
+    const st = {q: {}, dto: 10};
+    prods.forEach(p => { st.q[p.clave] = p.clave === 'mani' ? 1 : (p.clave === 'chocomani' ? 1 : 0); });
+    const stepper = document.getElementById('promo-stepper');
+    const slDto = document.getElementById('promo-dto');
+    function render() {
+      stepper.innerHTML = prods.map(p => `
+        <div class="cc-step">
+          <div class="cc-step-name">${esc(p.nombre)}</div>
+          <div class="cc-step-ctl"><button type="button" data-k="${p.clave}" data-d="-1" aria-label="menos">−</button><span class="cc-step-n">${st.q[p.clave]}</span><button type="button" data-k="${p.clave}" data-d="1" aria-label="más">+</button></div>
+          <div class="cc-step-sub">PVP ${fmtS2(p.pvp)} · costo ${fmtS2(p.costo)}</div>
+        </div>`).join('');
+      stepper.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { st.q[b.dataset.k] = Math.max(0, Math.min(6, st.q[b.dataset.k] + Number(b.dataset.d))); render(); }));
+      const n = prods.reduce((a, p) => a + st.q[p.clave], 0);
+      const costo = prods.reduce((a, p) => a + st.q[p.clave] * p.costo, 0);
+      const suma = prods.reduce((a, p) => a + st.q[p.clave] * p.pvp, 0);
+      const dto = st.dto / 100;
+      const exacto = suma * (1 - dto);
+      const precio = Math.round(exacto);
+      const dtoReal = suma ? 1 - precio / suma : 0;
+      const gan = precio - costo;
+      const margen = precio ? gan / precio : 0;
+      const cedida = suma - precio;
+      const nAlm = st.q['almendra'] || 0;
+      document.getElementById('promo-dto-txt').textContent = '· ' + fmtPct(dto);
+      document.getElementById('promo-precio').textContent = n ? fmtS2(precio) : '—';
+      document.getElementById('promo-precio-sub').textContent = n ? `${n} frasco${n > 1 ? 's' : ''} · sueltos ${fmtS2(suma)} · descuento real ${fmtPct(dtoReal)} (${fmtS2(cedida)}) · ${fmtS2(precio / n)} por frasco` : 'Agrega frascos';
+      document.getElementById('promo-margen').textContent = n ? fmtPct(margen) : '—';
+      const segs = [{v: costo, col: 'var(--s1)', l: 'Costo'}, {v: gan, col: 'var(--s2)', l: 'Ganancia'}, {v: cedida, col: 'var(--s4)', l: 'Cedido'}];
+      document.getElementById('promo-split').innerHTML = suma ? `<div class="cc-split" style="height:32px">${segs.map(x => `<div style="width:${Math.max(0, x.v / suma * 100).toFixed(1)}%;background:${x.col}" title="${x.l} ${fmtS2(x.v)}">${x.v / suma > 0.1 ? x.l + ' ' + fmtS2(x.v) : ''}</div>`).join('')}</div>` : '';
+      document.getElementById('promo-cascada').innerHTML = `
+        <div class="cc-cascade-row"><span class="k">Costo del combo</span><span class="v">${fmtS2(costo)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Frascos sueltos al PVP</span><span class="v">${fmtS2(suma)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Precio del combo (redondeado a soles)</span><span class="v">${fmtS2(precio)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Ganancia vendiendo sueltos</span><span class="v">${fmtS2(suma - costo)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Ganancia cedida por la promo</span><span class="v">${fmtS2(cedida)}</span></div>
+        <div class="cc-cascade-row is-total"><span class="k">Ganancia del combo</span><span class="v">${fmtS2(gan)} <small style="font-size:14px;font-family:var(--font-body)">(${fmtPct(margen)})</small></span></div>
+        ${(() => { const pk = DATA.promociones_propuesta.find(x => x.n_frascos === n && (nAlm === n ? x.pack.includes('almendra') : !x.pack.includes('almendra'))); if (!pk) return ''; const g = pk.precio_pack - costo; return `<div class="cc-cascade-row"><span class="k">Con el precio fijo del ${esc(pk.pack)} (${fmtS2(pk.precio_pack)})</span><span class="v">margen ${fmtPct(g / pk.precio_pack)} · ahorro ${fmtS2(suma - pk.precio_pack)}</span></div>`; })()}`;
+      const vd = document.getElementById('promo-verdict');
+      if (!n) { vd.className = 'cc-sim-verdict is-warn'; vd.textContent = 'Agrega al menos un frasco.'; }
+      else if (margen < 0.5) { vd.className = 'cc-sim-verdict is-bad'; vd.textContent = `No cumple: el combo deja ${fmtPct(margen)}, por debajo del 50% mínimo. Baja el descuento o quita almendra.`; }
+      else if (nAlm > 1 && n > nAlm) { vd.className = 'cc-sim-verdict is-warn'; vd.textContent = `Margen ${fmtPct(margen)}, pero un combo mixto con ${nAlm} almendras rompe la regla de "máximo 1 almendra por combo mixto".`; }
+      else if (dto > 0.12) { vd.className = 'cc-sim-verdict is-warn'; vd.textContent = `Margen ${fmtPct(margen)} (cumple), pero el descuento ${fmtPct(dto)} supera el 12% sugerido: cedes ${fmtS2(cedida)} por pack.`; }
+      else { vd.className = 'cc-sim-verdict is-good'; vd.textContent = `Cumple: ${fmtPct(margen)} de margen y ${fmtPct(dtoReal)} de descuento real. Ganas ${fmtS2(gan)} por pack (${fmtS2(cedida)} menos que sueltos).`; }
+    }
+    slDto.addEventListener('input', () => { st.dto = Number(slDto.value); render(); });
+    render();
+  }
+
+  // ================= TIENDAS =================
+  function tablaEscala(id, rows, esProp) {
+    const cols = [
+      {k: 'tramo', label: 'Tramo', render: r => `${r.tramo} · ${esc(r.nombre_tramo)}`},
+      {k: 'cond', label: 'Condición', render: r => esc(esProp ? r.condicion : r.condicion_excel)},
+    ];
+    if (esProp) cols.push({k: 'unidades_minimas', label: 'Frascos mín. (aprox.)', num: true, fmt: v => fmtN(v)});
+    cols.push(
+      {k: 'margen_mrpeanutt_pct', label: 'Margen Mr. Peanutt', fmt: fmtPct, num: true},
+      {k: 'precio_sin_igv', label: 'Precio sin IGV', fmt: fmtS2, num: true},
+      {k: 'precio_con_igv', label: 'Precio con IGV', fmt: fmtS2, num: true},
+      {k: 'ganancia_unit_sin_igv', label: 'Gana Mr. Peanutt / frasco', fmt: fmtS2, num: true},
+      {k: 'descuento_vs_comercial_pct', label: 'Dto. vs Comercial', fmt: fmtPct, num: true},
+      {k: 'ganancia_tienda_unit', label: 'Gana la tienda / frasco', fmt: fmtS2, num: true},
+      {k: 'margen_tienda_pct', label: 'Margen tienda', cls: 'center', render: r => badgeTienda(r.margen_tienda_pct)},
+    );
+    const out = [];
+    let last = null;
+    rows.forEach(r => { if (r.producto !== last) { out.push({__group: `${r.producto} — costo ${fmtS2(r.costo)} · PVP ${fmtS2(esProp ? r.pvp_sugerido : r.pvp_referencia)}`}); last = r.producto; } out.push(r); });
+    tabla(id, cols, out, {compact: true, fixed: true});
+  }
+  tablaEscala('cc-tie-propuesta', tiendasProp, true);
+  tablaEscala('cc-tie-excel', tiendasExcel, false);
+
+  // Cadena de valor: una tarjeta por producto con 3 escenarios en barras apiladas
+  {
+    const grupos = {};
+    DATA.cadena_valor.forEach(c => { (grupos[c.producto] = grupos[c.producto] || []).push(c); });
+    document.getElementById('cc-tie-cadena').innerHTML = `<div class="cc-product-grid" style="grid-template-columns:repeat(auto-fill,minmax(420px,1fr))">` + Object.entries(grupos).map(([prod, esc3]) => {
+      const c0 = esc3[0];
+      return `<div class="cc-product-card">
+        <div class="cc-product-name">${esc(prod)} <span class="cc-badge cc-badge-muted">PVP ${fmtS2(c0.pvp_con_igv)} · costo ${fmtS2(c0.costo)}</span></div>
+        ${esc3.map(c => {
+          const total = c.pvp_sin_igv;
+          const segs = [{l: 'Costo', v: c.costo, col: 'var(--s1)'}, {l: c.eslabon_1, v: c.gana_1, col: 'var(--s2)'}];
+          if (c.eslabon_2) segs.push({l: c.eslabon_2, v: c.gana_2, col: c.eslabon_3 ? 'var(--miel)' : 'var(--good)'});
+          if (c.eslabon_3) segs.push({l: c.eslabon_3, v: c.gana_3, col: 'var(--good)'});
+          const pct = (v) => (v / total * 100).toFixed(1) + '%';
+          return `<div style="margin-top:12px">
+            <div style="font-size:12.5px;font-weight:600;margin-bottom:6px">${esc(c.escenario)}</div>
+            <div class="cc-split">${segs.map(s => `<div style="width:${pct(s.v)};background:${s.col}" title="${esc(s.l)} ${fmtS2(s.v)}">${s.v / total > 0.12 ? esc(s.l) + ' ' + fmtS2(s.v) : ''}</div>`).join('')}</div>
+            <div class="cc-mini-note">Ingreso neto ${fmtS2(c.pvp_sin_igv)} · ${esc(c.eslabon_1)} ${fmtPct(c.margen_1_pct)}${c.eslabon_2 ? ` · ${esc(c.eslabon_2)} ${fmtPct(c.margen_2_pct)}` : ''}${c.eslabon_3 ? ` · ${esc(c.eslabon_3)} ${fmtPct(c.margen_3_pct)}` : ''} — ${esc(c.comentario)}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('') + '</div>';
+  }
+
+  // ================= RESTAURANTES =================
+  {
+    const cols = [
+      {k: 'tramo', label: 'Tramo', render: r => `${r.tramo} · ${esc(r.nombre_tramo)}${r.cambio_vs_excel ? `<span class="cc-sub">${esc(r.cambio_vs_excel)}</span>` : ''}`},
+      {k: 'condicion', label: 'Baldes por pedido', render: r => esc(r.condicion)},
+      {k: 'compra_minima_con_igv', label: 'Pedido mínimo (c/IGV)', fmt: fmtS2, num: true},
+      {k: 'margen_mrpeanutt_pct', label: 'Margen Mr. Peanutt', fmt: fmtPct, num: true},
+      {k: 'precio_sin_igv', label: 'Precio sin IGV', fmt: fmtS2, num: true},
+      {k: 'precio_con_igv', label: 'Precio con IGV', fmt: fmtS2, num: true},
+      {k: 'ganancia_unit_sin_igv', label: 'Gana Mr. Peanutt / balde', fmt: fmtS2, num: true},
+      {k: 'descuento_vs_comercial_pct', label: 'Dto. vs Comercial', fmt: fmtPct, num: true},
+      {k: 'precio_por_kg_con_igv', label: 'Precio por kg (c/IGV)', fmt: fmtS2, num: true},
+    ];
+    const out = []; let last = null;
+    baldesProp.forEach(r => { if (r.producto !== last) { out.push({__group: `${r.producto} — costo ${fmtS2(r.costo)}`}); last = r.producto; } out.push(r); });
+    tabla('cc-res-baldes', cols, out, {compact: true});
+    tabla('cc-res-baldes-excel', [
+      {k: 'tramo', label: 'Tramo', render: r => `${r.tramo} · ${esc(r.nombre_tramo)}`},
+      {k: 'condicion_excel', label: 'Condición Excel'},
+      {k: 'costo', label: 'Costo', fmt: fmtS2, num: true},
+      {k: 'margen_mrpeanutt_pct', label: 'Margen Mr. Peanutt', fmt: fmtPct, num: true},
+      {k: 'precio_sin_igv', label: 'Precio sin IGV', fmt: fmtS2, num: true},
+      {k: 'precio_con_igv', label: 'Precio con IGV', fmt: fmtS2, num: true},
+      {k: 'descuento_vs_comercial_pct', label: 'Dto. vs Comercial', fmt: fmtPct, num: true},
+      {k: 'unidades_minimas', label: 'Baldes mín. (umbral / precio c/IGV)', num: true, fmt: v => fmtN(v, 2)},
+      {k: 'precio_por_kg_con_igv', label: 'Precio por kg (c/IGV)', fmt: fmtS2, num: true},
+    ], baldesExcel, {compact: true});
+
+    const porc = DATA.restaurantes_porcion;
+    const maxKg = Math.max(...porc.map(p => p.precio_por_kg_con_igv));
+    document.getElementById('cc-res-kg').innerHTML = porc.map(p => `
+      <div class="cc-bar-row">
+        <div class="cc-bar-label">${esc(p.formato)}<small>${esc(p.nombre_tramo)} · ${fmtS2(p.precio_con_igv)} c/u</small></div>
+        <div class="cc-bar-track"><div class="cc-bar-fill" style="width:${(p.precio_por_kg_con_igv / maxKg * 100).toFixed(1)}%;background:${p.formato.startsWith('Frasco') ? 'var(--s2)' : p.formato.startsWith('Balde 4') ? 'var(--s1)' : 'var(--s3)'}"></div></div>
+        <div class="cc-bar-value">${fmtS2(p.precio_por_kg_con_igv)}/kg</div>
+      </div>`).join('');
+    tabla('cc-res-porcion', [
+      {k: 'formato', label: 'Formato'}, {k: 'nombre_tramo', label: 'Tramo'},
+      {k: 'precio_con_igv', label: 'Precio (c/IGV)', fmt: fmtS2, num: true},
+      {k: 'precio_por_kg_con_igv', label: 'Por kg (c/IGV)', fmt: fmtS2, num: true},
+      {k: 'costo_porcion', label: `Porción de ${fmtN(porc[0].porcion_gr)} g`, fmt: fmtS2, num: true},
+      {k: 'ahorro_vs_frasco_pct', label: 'Ahorro vs frasco', fmt: fmtPct, num: true},
+      {k: 'margen_mrpeanutt_pct', label: 'Margen Mr. Peanutt', fmt: fmtPct, num: true},
+      {k: 'ganancia_mrpeanutt_por_kg', label: 'Gana Mr. Peanutt por kg', fmt: fmtS2, num: true},
+    ], porc, {rowClass: r => r.formato.startsWith('Frasco') ? 'is-highlight' : ''});
+  }
+
+  // ================= PUNTO DE EQUILIBRIO =================
+  {
+    const PE = DATA.punto_equilibrio;
+    const cons = PE.find(p => p.es_conservador);
+    pintarKpis('cc-pe-kpis', [
+      {label: 'Costos fijos / mes', value: fmtS2(K.costos_fijos_total), sub: DATA.costos_fijos.map(c => c.concepto.split(' (')[0] + ' ' + fmtS(c.monto_mensual)).join(' + ')},
+      {label: 'Equilibrio conservador (con IGV)', value: fmtS(cons.venta_equilibrio_con_igv), sub: `${fmtS(cons.venta_equilibrio_sin_igv)} sin IGV · margen ${fmtPct(cons.margen_pct)} (${esc(cons.producto)}, ${esc(cons.tramo)})`, accent: true},
+      {label: 'Unidades al mes (conservador)', value: fmtN(cons.unidades_equilibrio), sub: `${fmtN(cons.unidades_por_dia, 1)} por día (26 días)`},
+    ]);
+    tabla('cc-pe-costos', [
+      {k: 'concepto', label: 'Concepto'}, {k: 'categoria', label: 'Categoría'},
+      {k: 'monto_mensual', label: 'Monto mensual', fmt: fmtS2, num: true}, {k: 'nota', label: 'Nota', cls: 'wrap'},
+    ], DATA.costos_fijos);
+    tabla('cc-pe-tabla', [
+      {k: 'escenario', label: 'Escenario', cls: 'wrap'},
+      {k: 'margen_pct', label: 'Margen', fmt: fmtPct, num: true},
+      {k: 'venta_equilibrio_sin_igv', label: 'Venta equilibrio sin IGV', fmt: fmtS2, num: true},
+      {k: 'venta_equilibrio_con_igv', label: 'Venta equilibrio con IGV', fmt: fmtS2, num: true},
+      {k: 'precio_unit_con_igv', label: 'Precio unit. (c/IGV)', fmt: fmtS2, num: true},
+      {k: 'unidades_equilibrio', label: 'Unidades / mes', num: true, fmt: v => fmtN(v)},
+      {k: 'unidades_por_dia', label: 'Unidades / día', num: true, fmt: v => fmtN(v, 1)},
+      {k: 'comentario', label: 'Lectura', cls: 'wrap'},
+    ], PE, {rowClass: r => r.es_conservador ? 'is-highlight' : '', compact: true});
+
+    const slCf = document.getElementById('pe-cf');
+    const segEsc = document.getElementById('pe-esc');
+    const st = {cf: K.costos_fijos_total, esc: cons.id};
+    slCf.value = st.cf;
+    function render() {
+      segEsc.innerHTML = PE.map(p => `<button type="button" aria-pressed="${p.id === st.esc}" data-v="${p.id}">${esc(p.escenario.replace('CONSERVADOR (margen más bajo de toda la escala)', 'Conservador').replace('Mantequilla de ', '').replace('Mantequilla ', ''))}</button>`).join('');
+      segEsc.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { st.esc = Number(b.dataset.v); render(); }));
+      const p = PE.find(x => x.id === st.esc);
+      const venta = st.cf / p.margen_pct;
+      const u = venta / p.precio_unit_sin_igv;
+      document.getElementById('pe-cf-txt').textContent = '· ' + fmtS2(st.cf);
+      document.getElementById('pe-out-venta').textContent = fmtS(venta * IGV);
+      document.getElementById('pe-cascada').innerHTML = `
+        <div class="cc-cascade-row"><span class="k">Costos fijos</span><span class="v">${fmtS2(st.cf)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Margen del escenario</span><span class="v">${fmtPct(p.margen_pct)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Venta de equilibrio sin IGV</span><span class="v">${fmtS2(venta)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Precio unitario con IGV</span><span class="v">${fmtS2(p.precio_unit_con_igv)}</span></div>
+        <div class="cc-cascade-row is-total"><span class="k">Unidades al mes</span><span class="v">${fmtN(u)} <small style="font-size:14px;font-family:var(--font-body)">(${fmtN(u / 26, 1)} por día)</small></span></div>`;
+    }
+    slCf.addEventListener('input', () => { st.cf = Number(slCf.value); render(); });
+    render();
+  }
+
+  // ================= HALLAZGOS =================
+  tabla('cc-hal-reco', [
+    {k: 'prioridad', label: '#', num: true}, {k: 'area', label: 'Área'},
+    {k: 'recomendacion', label: 'Recomendación', cls: 'wrap'}, {k: 'impacto', label: 'Impacto', cls: 'wrap'},
+  ], DATA.recomendaciones);
+  pintarIssues('cc-hal-issues', DATA.issues);
+})();
+</script>
+</body>
+</html>
