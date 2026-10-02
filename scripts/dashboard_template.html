@@ -179,6 +179,9 @@
   .cc-seg button { appearance: none; border: none; background: var(--surface); color: var(--text-secondary); font-family: var(--font-body); font-size: 14px; font-weight: 600; padding: 9px 14px; cursor: pointer; border-right: 1px solid var(--border); }
   .cc-seg button:last-child { border-right: none; }
   .cc-seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+  .sab-slots { display: grid; gap: 10px; }
+  .sab-slot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .sab-slot-lbl { font-weight: 700; min-width: 72px; font-size: 14.5px; }
   .cc-cascade-row { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--gridline); font-size: 15px; }
   .cc-cascade-row .k { color: var(--text-secondary); }
   .cc-cascade-row .v { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
@@ -295,7 +298,7 @@
     <div class="cc-section">
       <div class="cc-section-head">
         <div><h2 class="cc-section-title">Cómo se arma el costo del balde</h2>
-        <p class="cc-section-sub">El de 4 kg viene completo del Excel. El de 1 kg solo traía el envase (S/3.00): se propone el costeo completo con la misma etiqueta.</p></div>
+        <p class="cc-section-sub">Envase con el costo de la <strong>compra real</strong> (12 baldes de 1 kg por S/36 = S/3.00 c/u; 12 baldes de 4 L por S/55 = S/4.58 c/u) + mantequilla + etiqueta. Los de almendra son una <strong>simulación</strong>: la mantequilla de almendra se costea a partir del frasco.</p></div>
       </div>
       <div class="cc-product-grid" id="cc-prod-baldes"></div>
     </div>
@@ -328,6 +331,46 @@
       <details class="cc-details"><summary>Ver todas las mezclas posibles de cada pack</summary>
         <div class="cc-details-body"><div class="cc-table-wrap" id="cc-dir-packs-mezclas"></div></div>
       </details>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Packs VIP: solo clientes fidelizados</h2>
+        <p class="cc-section-sub">Precios especiales que <strong>no se publican</strong>: se ofrecen solo a clientes fidelizados. Los packs de arriba siguen siendo los oficiales para el público. Misma mecánica y misma regla de máximo 1 almendra por pack mixto.</p></div>
+      </div>
+      <div class="cc-kpi-grid" id="cc-vip-kpis"></div>
+      <div class="cc-table-wrap" id="cc-vip-packs" style="margin-top:14px"></div>
+      <p class="cc-mini-note">Rojo = alguna mezcla permitida baja del piso de 50%. Ojo: el Pack 3 y el Pack 4 VIP salen a S/15 por frasco, menos de lo que paga la tienda en Comercial; por eso no deben salir del círculo VIP.</p>
+      <details class="cc-details"><summary>Ver todas las mezclas posibles de cada pack VIP</summary>
+        <div class="cc-details-body"><div class="cc-table-wrap" id="cc-vip-mezclas"></div></div>
+      </details>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Simulador: escoge los sabores del pack</h2>
+        <p class="cc-section-sub">Elige la lista de precios (oficial o VIP), cuántos frascos y el sabor de cada uno. El precio es el del pack por cantidad; solo si <strong>todos</strong> los frascos son almendra y esa lista tiene un pack de solo almendra, se cobra ese precio (se indica en el detalle). Ves el margen, la ganancia y cuánto ahorra el cliente frente a comprarlos sueltos.</p></div>
+      </div>
+      <div class="cc-sim">
+        <div class="cc-sim-controls" style="grid-template-columns: 1fr">
+          <div class="cc-sim-field"><label>Lista de precios</label><div class="cc-seg" id="sab-lista"></div></div>
+          <div class="cc-sim-field"><label>Tamaño del pack</label><div class="cc-seg" id="sab-n"></div></div>
+          <div class="cc-sim-field"><label>Sabores</label><div class="sab-slots" id="sab-slots"></div></div>
+        </div>
+        <div class="cc-sim-grid">
+          <div>
+            <div class="cc-sim-readout" id="sab-margen"></div>
+            <div class="cc-sim-readout-sub" id="sab-margen-sub"></div>
+            <div style="margin-top:16px" id="sab-split"></div>
+            <div class="cc-legend"><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s1)"></i>Costo</span><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s2)"></i>Ganancia</span><span class="cc-legend-item"><i class="cc-legend-swatch" style="background:var(--s4)"></i>Ahorro del cliente</span></div>
+          </div>
+          <div>
+            <div id="sab-cascada"></div>
+            <div class="cc-sim-verdict" id="sab-verdict"></div>
+          </div>
+        </div>
+      </div>
+      <h3 class="cc-section-title" style="font-size:22px;margin-top:22px">Margen según cuántas almendras lleva el pack · <span id="sab-matriz-lista"></span></h3>
+      <p class="cc-section-sub">Peor caso: el resto del pack es chocomaní o crunchy (los que más cuestan después de la almendra). Con maní el margen sube ~0.2 puntos.</p>
+      <div class="cc-table-wrap" id="sab-matriz" style="margin-top:10px"></div>
     </div>
     <div class="cc-section">
       <div class="cc-section-head">
@@ -425,9 +468,13 @@
     <div class="cc-section">
       <div class="cc-section-head">
         <div><h2 class="cc-section-title">Escala propuesta para baldes</h2>
-        <p class="cc-section-sub">Tramos por <strong>cantidad de baldes por pedido</strong> (más fácil de comunicar que "compras mayores a S/400"). Márgenes iguales al Excel, precio con IGV redondeado a S/1. El balde de 1 kg usa el costeo propuesto.</p></div>
+        <p class="cc-section-sub">Tramos por <strong>cantidad de baldes por pedido</strong>. Costo del balde con el <strong>envase de la compra real</strong>; maní con los márgenes del Excel (59 / 52 / 46 / 41%), precio con IGV redondeado a S/1. El balde de <strong>almendra es una simulación</strong> con márgenes 40 / 35 / 30 / 25%.</p></div>
       </div>
-      <div class="cc-table-wrap" id="cc-res-baldes"></div>
+      <div class="cc-kpi-grid cols-4" id="cc-res-costos"></div>
+      <div class="cc-table-wrap" id="cc-res-baldes" style="margin-top:14px"></div>
+      <details class="cc-details"><summary>Ver la compra de envases (de dónde sale el costo del envase)</summary>
+        <div class="cc-details-body"><div class="cc-table-wrap" id="cc-res-envases"></div></div>
+      </details>
       <details class="cc-details"><summary>Ver la escala del balde de 4 kg tal como está en el Excel (as-is)</summary>
         <div class="cc-details-body"><div class="cc-table-wrap" id="cc-res-baldes-excel"></div></div>
       </details>
@@ -439,6 +486,34 @@
       </div>
       <div class="cc-barchart" id="cc-res-kg"></div>
       <div class="cc-table-wrap" id="cc-res-porcion" style="margin-top:14px"></div>
+    </div>
+    <div class="cc-section">
+      <div class="cc-section-head">
+        <div><h2 class="cc-section-title">Baldes para público final</h2>
+        <p class="cc-section-sub">Venta por canal directo (NRUS, <strong>sin IGV</strong>). Dos reglas: margen mínimo <strong>50%</strong> y el público <strong>nunca paga menos que el restaurante</strong> en el tramo Comercial; si no, el restaurante deja de comprar por B2B. Precio recomendado = el mayor de los dos, redondeado hacia arriba a S/5.</p></div>
+      </div>
+      <div class="cc-kpi-grid cols-4" id="cc-pub-kpis"></div>
+      <div class="cc-table-wrap" id="cc-pub-tabla" style="margin-top:14px"></div>
+      <div class="cc-sim" style="margin-top:18px">
+        <div class="cc-sim-controls">
+          <div class="cc-sim-field"><label>Balde</label><div class="cc-seg" id="pub-balde"></div></div>
+          <div class="cc-sim-field">
+            <label>Margen a público final <span id="pub-m-txt"></span></label>
+            <input type="range" class="cc-sim-slider" id="pub-m" min="40" max="80" step="1">
+          </div>
+        </div>
+        <div class="cc-sim-grid">
+          <div>
+            <div class="cc-sim-readout" id="pub-out-precio"></div>
+            <div class="cc-sim-readout-sub" id="pub-out-sub"></div>
+          </div>
+          <div id="pub-cascada"></div>
+        </div>
+        <div class="cc-sim-verdict" id="pub-verdict"></div>
+      </div>
+      <details class="cc-details"><summary>Ver el precio de cada balde con margen 50 / 55 / 60 / 65 / 70%</summary>
+        <div class="cc-details-body"><div class="cc-table-wrap" id="cc-pub-esc"></div></div>
+      </details>
     </div>
   </section>
 
@@ -651,7 +726,7 @@
     {k: 'costo_por_kg', label: 'Costo por kg', fmt: fmtS2, num: true},
     {k: 'costo_insumo_principal_est', label: 'Insumo principal (est.)', fmt: fmtS2, num: true},
     {k: 'costo_envase_y_otros_est', label: 'Envase + etiqueta + otros (est.)', fmt: fmtS2, num: true},
-    {k: 'estado', label: 'Estado', render: r => r.estado === 'Excel' ? '<span class="cc-badge cc-badge-muted">Excel</span>' : `<span class="cc-badge cc-badge-warn">${esc(r.estado)}</span>`},
+    {k: 'estado', label: 'Estado', render: r => r.estado === 'Excel' ? '<span class="cc-badge cc-badge-muted">Excel</span>' : r.estado === 'Real' ? '<span class="cc-badge cc-badge-good">costo real</span>' : `<span class="cc-badge cc-badge-warn">${esc(r.estado)}</span>`},
     {k: 'fuente', label: 'Fuente', cls: 'wrap'},
   ], DATA.productos_costeo);
   {
@@ -659,7 +734,7 @@
     DATA.costeo_balde_detalle.forEach(d => { (grupos[d.producto] = grupos[d.producto] || []).push(d); });
     document.getElementById('cc-prod-baldes').innerHTML = Object.entries(grupos).map(([nombre, det]) => `
       <div class="cc-product-card">
-        <div class="cc-product-name">${esc(nombre)} ${det.some(d => d.estado.startsWith('Propuesto')) ? '<span class="cc-badge cc-badge-warn">propuesto</span>' : '<span class="cc-badge cc-badge-muted">Excel</span>'}</div>
+        <div class="cc-product-name">${esc(nombre)} ${det.some(d => d.estado === 'Simulación') ? '<span class="cc-badge cc-badge-warn">simulación</span>' : '<span class="cc-badge cc-badge-good">costo real</span>'}</div>
         ${det.map(d => `<div class="cc-product-row" ${d.componente === 'COSTO TOTAL' ? 'style="font-weight:700"' : ''}><span class="k">${esc(d.componente)}${d.cantidad ? ` <small>(${fmtN(d.cantidad)} ${esc(d.unidad)} × ${fmtS2(d.costo_unitario)})</small>` : ''}</span><span class="v">${fmtS2(d.costo_total)}</span></div>`).join('')}
       </div>`).join('');
   }
@@ -792,6 +867,120 @@
     ], DATA.promociones_terminos);
   }
 
+  // ---- Simulador de sabores del pack
+  {
+    const NOMBRE = {mani: 'Maní', chocomani: 'Chocomaní', crunchy: 'Crunchy', almendra: 'Almendra'};
+    const CD = Object.fromEntries(DATA.canal_directo.map(d => [d.clave, d]));
+    const SAB = ['mani', 'chocomani', 'crunchy', 'almendra'].filter(k => CD[k]);
+    const LISTAS = {oficial: {label: 'Oficial (público)', packs: DATA.promociones_propuesta}, vip: {label: 'VIP (clientes fidelizados)', packs: DATA.packs_vip || []}};
+    const pTienda = DATA.packs_escenarios.length ? DATA.packs_escenarios[0].precio_tienda_comercial : null;
+    const st = {lista: 'oficial', n: 4, slots: ['mani', 'chocomani', 'crunchy', 'almendra']};
+    function packPara(n, nAlm, lista) {
+      const PK = LISTAS[lista || st.lista].packs;
+      if (nAlm === n) { const a = PK.find(x => x.n_frascos === n && x.pack.includes('almendra')); if (a) return a; }
+      return PK.find(x => x.n_frascos === n && !x.pack.includes('almendra'));
+    }
+    // Tablas de los packs VIP (mismas columnas que los oficiales)
+    {
+      const PV = LISTAS.vip.packs;
+      const rango = (a, b, f) => a === b ? f(a) : `${f(a)} – ${f(b)}`;
+      pintarKpis('cc-vip-kpis', PV.map(p => ({
+        label: `${p.pack} · ${p.n_frascos} frascos`, value: fmtS2(p.precio_pack),
+        sub: `${fmtS2(p.precio_por_frasco)} por frasco · ahorras ${rango(p.ahorro_min, p.ahorro_max, fmtS2)} · margen ${rango(p.margen_min_pct, p.margen_max_pct, fmtPct)}`,
+      })));
+      tabla('cc-vip-packs', [
+        {k: 'pack', label: 'Pack', render: r => `<strong>${esc(r.pack)}</strong><span class="cc-sub">${esc(r.regla)}</span>`},
+        {k: 'precio_pack', label: 'Precio VIP', num: true, render: r => `<strong>${fmtS2(r.precio_pack)}</strong>`},
+        {k: 'precio_por_frasco', label: 'Por frasco', fmt: fmtS2, num: true},
+        {k: 'sueltos', label: 'Sueltos al PVP', num: true, render: r => rango(r.sueltos_min, r.sueltos_max, fmtS2)},
+        {k: 'ahorro', label: 'Ahorro del cliente', num: true, render: r => `${rango(r.ahorro_min, r.ahorro_max, fmtS2)}<span class="cc-sub">${rango(r.descuento_min_pct, r.descuento_max_pct, fmtPct)}</span>`},
+        {k: 'margen', label: 'Margen Mr. Peanutt', cls: 'center', render: r => `<span class="cc-badge ${r.margen_min_pct >= 0.5 ? 'cc-badge-good' : 'cc-badge-crit'}">${rango(r.margen_min_pct, r.margen_max_pct, fmtPct)}</span>`},
+        {k: 'ganancia', label: 'Ganancia / pack', num: true, render: r => rango(r.ganancia_min, r.ganancia_max, fmtS2)},
+        {k: 'mezcla_peor_margen', label: 'Peor mezcla (margen)', cls: 'wrap'},
+      ], PV, {compact: true});
+      const out = []; let last = null;
+      (DATA.packs_vip_mezclas || []).forEach(r => { if (r.pack !== last) { out.push({__group: `${r.pack} — ${fmtS2(r.precio_pack)}`}); last = r.pack; } out.push(r); });
+      tabla('cc-vip-mezclas', [
+        {k: 'mezcla', label: 'Mezcla'},
+        {k: 'costo', label: 'Costo', fmt: fmtS2, num: true},
+        {k: 'sueltos', label: 'Sueltos', fmt: fmtS2, num: true},
+        {k: 'ahorro', label: 'Ahorro', num: true, render: r => `${fmtS2(r.ahorro)} (${fmtPct(r.descuento_pct)})`},
+        {k: 'ganancia', label: 'Ganancia', fmt: fmtS2, num: true},
+        {k: 'margen_pct', label: 'Margen', cls: 'center', render: r => `<span class="cc-badge ${r.margen_pct >= 0.5 ? 'cc-badge-good' : 'cc-badge-crit'}">${fmtPct(r.margen_pct)}</span>`},
+      ], out, {compact: true});
+    }
+    const segLista = document.getElementById('sab-lista');
+    const segN = document.getElementById('sab-n'), slotsEl = document.getElementById('sab-slots');
+    function render() {
+      segLista.innerHTML = Object.entries(LISTAS).map(([k, l]) => `<button type="button" aria-pressed="${k === st.lista}" data-l="${k}">${esc(l.label)}</button>`).join('');
+      segLista.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { st.lista = b.dataset.l; render(); renderMatriz(); }));
+      segN.innerHTML = [2, 3, 4].map(n => { const p = packPara(n, 0); return `<button type="button" aria-pressed="${n === st.n}" data-n="${n}">${n} frascos · ${fmtS2(p.precio_pack)}</button>`; }).join('');
+      segN.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { st.n = Number(b.dataset.n); render(); }));
+      slotsEl.innerHTML = Array.from({length: st.n}, (_, i) => `
+        <div class="sab-slot"><span class="sab-slot-lbl">Frasco ${i + 1}</span>
+          <div class="cc-seg">${SAB.map(k => `<button type="button" aria-pressed="${st.slots[i] === k}" data-i="${i}" data-k="${k}">${NOMBRE[k]}</button>`).join('')}</div>
+        </div>`).join('');
+      slotsEl.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { st.slots[Number(b.dataset.i)] = b.dataset.k; render(); }));
+      const elegidos = st.slots.slice(0, st.n);
+      const nAlm = elegidos.filter(k => k === 'almendra').length;
+      const pk = packPara(st.n, nAlm);
+      const precio = pk.precio_pack;
+      const costo = elegidos.reduce((a, k) => a + CD[k].costo, 0);
+      const sueltos = elegidos.reduce((a, k) => a + CD[k].pvp_redondeado, 0);
+      const gan = precio - costo, margen = gan / precio, ahorro = sueltos - precio;
+      const porFrasco = precio / st.n;
+      const cuenta = {}; elegidos.forEach(k => { cuenta[k] = (cuenta[k] || 0) + 1; });
+      const mezcla = SAB.filter(k => cuenta[k]).map(k => cuenta[k] > 1 ? `${cuenta[k]} ${NOMBRE[k]}` : NOMBRE[k]).join(' + ');
+      document.getElementById('sab-margen').textContent = fmtPct(margen);
+      document.getElementById('sab-margen-sub').textContent = `margen de Mr. Peanutt · ${mezcla}`;
+      const segs = [{v: costo, col: 'var(--s1)', l: 'Costo'}, {v: gan, col: 'var(--s2)', l: 'Ganancia'}, {v: ahorro, col: 'var(--s4)', l: 'Ahorro'}];
+      document.getElementById('sab-split').innerHTML = `<div class="cc-split" style="height:32px">${segs.map(x => `<div style="width:${Math.max(0, x.v / sueltos * 100).toFixed(1)}%;background:${x.col}" title="${x.l} ${fmtS2(x.v)}">${x.v / sueltos > 0.1 ? x.l + ' ' + fmtS2(x.v) : ''}</div>`).join('')}</div>`;
+      document.getElementById('sab-cascada').innerHTML = `
+        <div class="cc-cascade-row"><span class="k">Precio aplicado: ${esc(pk.pack)}${pk.pack.includes('almendra') ? ` (los ${st.n} son almendra)` : ''}</span><span class="v">${fmtS2(precio)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Precio por frasco</span><span class="v">${fmtS2(porFrasco)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Costo de los ${st.n} frascos</span><span class="v">${fmtS2(costo)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Sueltos al PVP</span><span class="v">${fmtS2(sueltos)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Ahorro del cliente</span><span class="v">${fmtS2(ahorro)} (${fmtPct(ahorro / sueltos)})</span></div>
+        <div class="cc-cascade-row"><span class="k">Ganancia si los vendieras sueltos</span><span class="v">${fmtS2(sueltos - costo)}</span></div>
+        <div class="cc-cascade-row is-total"><span class="k">Ganancia del pack</span><span class="v">${fmtS2(gan)} <small style="font-size:14px;font-family:var(--font-body)">(${fmtPct(margen)})</small></span></div>`;
+      const avisos = [];
+      if (nAlm > 1 && nAlm < st.n) avisos.push(`Lleva ${nAlm} almendras: rompe la regla de máximo 1 almendra por pack mixto.`);
+      if (nAlm === st.n && !pk.pack.includes('almendra')) avisos.push(`No hay pack de ${st.n} almendras: se cobra como pack mixto.`);
+      if (pTienda && porFrasco < pTienda && !pk.pack.includes('almendra')) avisos.push(`${fmtS2(porFrasco)} por frasco queda por debajo de lo que paga la tienda en Comercial (${fmtS2(pTienda)}).`);
+      const vd = document.getElementById('sab-verdict');
+      if (margen < 0.5) { vd.className = 'cc-sim-verdict is-bad'; vd.textContent = `No cumple: ${fmtPct(margen)} de margen, bajo el piso de 50%. ` + avisos.join(' '); }
+      else if (avisos.length) { vd.className = 'cc-sim-verdict is-warn'; vd.textContent = `Margen ${fmtPct(margen)} (cumple), pero: ` + avisos.join(' '); }
+      else { vd.className = 'cc-sim-verdict is-good'; vd.textContent = `Cumple: ${fmtPct(margen)} de margen. Ganas ${fmtS2(gan)} y el cliente ahorra ${fmtS2(ahorro)}.`; }
+    }
+    // Matriz: margen por número de almendras (resto chocomaní = peor caso), para la lista elegida
+    const relleno = CD.chocomani ? 'chocomani' : 'mani';
+    function renderMatriz() {
+    document.getElementById('sab-matriz-lista').textContent = LISTAS[st.lista].label;
+    const filas = [2, 3, 4].map(n => {
+      const r = {pack: `${n} frascos`};
+      for (let a = 0; a <= 4; a++) {
+        if (a > n) { r['a' + a] = null; continue; }
+        const pk = packPara(n, a);
+        const costo = a * CD.almendra.costo + (n - a) * CD[relleno].costo;
+        r['a' + a] = {m: (pk.precio_pack - costo) / pk.precio_pack, precio: pk.precio_pack, fuera: a > 1 && a < n, sinPack: a === n && a > 1 && !pk.pack.includes('almendra'), soloAlm: a === n && pk.pack.includes('almendra')};
+      }
+      return r;
+    });
+    const celda = v => {
+      if (!v) return '<span class="cc-sub">—</span>';
+      const cls = v.m >= 0.5 ? 'cc-badge-good' : 'cc-badge-crit';
+      const nota = v.soloAlm ? `pack de almendra ${fmtS2(v.precio)}` : v.fuera ? 'fuera de regla' : v.sinPack ? `sin pack de almendra, a ${fmtS2(v.precio)}` : `a ${fmtS2(v.precio)}`;
+      return `<span class="cc-badge ${cls}">${fmtPct(v.m)}</span><span class="cc-sub">${nota}</span>`;
+    };
+    tabla('sab-matriz', [
+      {k: 'pack', label: 'Pack', render: r => `<strong>${esc(r.pack)}</strong>`},
+      ...[0, 1, 2, 3, 4].map(a => ({k: 'a' + a, label: a === 1 ? '1 almendra' : `${a} almendras`, cls: 'center', render: r => celda(r['a' + a])})),
+    ], filas, {compact: true});
+    }
+    render();
+    renderMatriz();
+  }
+
   // ---- Armador de promociones
   {
     const NOMBRE = {mani: 'Maní', almendra: 'Almendra', chocomani: 'Chocomaní', crunchy: 'Crunchy'};
@@ -920,12 +1109,25 @@
       {k: 'precio_por_kg_con_igv', label: 'Precio por kg (c/IGV)', fmt: fmtS2, num: true},
     ], baldesExcel, {compact: true});
 
+    pintarKpis('cc-res-costos', DATA.productos_costeo.filter(p => p.familia === 'BALDE').map(p => ({
+      label: `${p.presentacion}${p.estado === 'Simulación' ? ' · simulación' : ''}`,
+      value: fmtS2(p.costo_unitario),
+      sub: `${fmtS2(p.costo_por_kg)} por kg · insumo ${fmtS2(p.costo_insumo_principal_est)} + envase y etiqueta ${fmtS2(p.costo_envase_y_otros_est)}`,
+      accent: p.estado === 'Simulación'})));
+    tabla('cc-res-envases', [
+      {k: 'envase', label: 'Envase'}, {k: 'unidades', label: 'Unidades', num: true},
+      {k: 'total_pagado', label: 'Total pagado', fmt: fmtS2, num: true},
+      {k: 'costo_unitario', label: 'Costo por balde', fmt: fmtS2, num: true},
+      {k: 'costo_excel', label: 'Costo en el Excel', fmt: fmtS2, num: true},
+      {k: 'diferencia_vs_excel', label: 'Diferencia', fmt: fmtS2, num: true},
+    ], DATA.compras_envases);
+
     const porc = DATA.restaurantes_porcion;
     const maxKg = Math.max(...porc.map(p => p.precio_por_kg_con_igv));
     document.getElementById('cc-res-kg').innerHTML = porc.map(p => `
       <div class="cc-bar-row">
         <div class="cc-bar-label">${esc(p.formato)}<small>${esc(p.nombre_tramo)} · ${fmtS2(p.precio_con_igv)} c/u</small></div>
-        <div class="cc-bar-track"><div class="cc-bar-fill" style="width:${(p.precio_por_kg_con_igv / maxKg * 100).toFixed(1)}%;background:${p.formato.startsWith('Frasco') ? 'var(--s2)' : p.formato.startsWith('Balde 4') ? 'var(--s1)' : 'var(--s3)'}"></div></div>
+        <div class="cc-bar-track"><div class="cc-bar-fill" style="width:${(p.precio_por_kg_con_igv / maxKg * 100).toFixed(1)}%;background:${p.formato.startsWith('Frasco') ? 'var(--s2)' : p.formato.includes('almendra') ? 'var(--s4)' : p.formato.startsWith('Balde 4') ? 'var(--s1)' : 'var(--s3)'}"></div></div>
         <div class="cc-bar-value">${fmtS2(p.precio_por_kg_con_igv)}/kg</div>
       </div>`).join('');
     tabla('cc-res-porcion', [
@@ -937,6 +1139,64 @@
       {k: 'margen_mrpeanutt_pct', label: 'Margen Mr. Peanutt', fmt: fmtPct, num: true},
       {k: 'ganancia_mrpeanutt_por_kg', label: 'Gana Mr. Peanutt por kg', fmt: fmtS2, num: true},
     ], porc, {rowClass: r => r.formato.startsWith('Frasco') ? 'is-highlight' : ''});
+
+    // ---- Baldes para público final ----
+    const PUB = DATA.baldes_publico;
+    pintarKpis('cc-pub-kpis', PUB.map(b => ({
+      label: `${b.producto}${b.estado === 'Simulación' ? ' · simulación' : ''}`,
+      value: fmtS(b.precio_recomendado),
+      sub: `margen ${fmtPct(b.margen_pct)} · gana ${fmtS2(b.ganancia)} · ${fmtS2(b.precio_por_kg)}/kg`,
+      accent: b.clave === 'balde1'})));
+    tabla('cc-pub-tabla', [
+      {k: 'producto', label: 'Balde', render: r => `${esc(r.producto)}${r.estado === 'Simulación' ? ' <span class="cc-badge cc-badge-warn">simulación</span>' : ''}`},
+      {k: 'costo', label: 'Costo', fmt: fmtS2, num: true},
+      {k: 'precio_margen_minimo', label: 'Precio con 50%', fmt: fmtS2, num: true},
+      {k: 'precio_restaurante_con_igv', label: 'Paga el restaurante (Comercial c/IGV)', fmt: fmtS2, num: true},
+      {k: 'precio_recomendado', label: 'Precio público recomendado', num: true, render: r => `<strong>${fmtS2(r.precio_recomendado)}</strong>`},
+      {k: 'margen_pct', label: 'Margen', fmt: fmtPct, num: true},
+      {k: 'ganancia', label: 'Gana Mr. Peanutt / balde', fmt: fmtS2, num: true},
+      {k: 'precio_por_kg', label: 'Por kg', fmt: fmtS2, num: true},
+      {k: 'ahorro_vs_frasco_pct', label: 'Ahorro vs frasco (por kg)', fmt: fmtPct, num: true},
+      {k: 'criterio', label: 'Por qué ese precio', cls: 'wrap', render: r => `${esc(r.criterio)}<span class="cc-sub">${esc(r.comentario)}</span>`},
+    ], PUB, {rowClass: r => r.clave === 'balde1' ? 'is-highlight' : ''});
+    tabla('cc-pub-esc', [
+      {k: 'producto', label: 'Balde'},
+      {k: 'margen_objetivo_pct', label: 'Margen objetivo', fmt: fmtPct, num: true},
+      {k: 'precio', label: 'Precio (sin IGV)', fmt: fmtS2, num: true},
+      {k: 'ganancia', label: 'Gana Mr. Peanutt', fmt: fmtS2, num: true},
+      {k: 'precio_por_kg', label: 'Por kg', fmt: fmtS2, num: true},
+      {k: 'precio_restaurante_con_igv', label: 'Paga el restaurante', fmt: fmtS2, num: true},
+      {k: 'debajo_de_restaurante', label: '¿Más barato que el restaurante?', cls: 'center', render: r => r.debajo_de_restaurante ? '<span class="cc-badge cc-badge-crit">sí, no usar</span>' : '<span class="cc-badge cc-badge-good">no</span>'},
+    ], DATA.baldes_publico_escenarios, {compact: true});
+
+    const segB = document.getElementById('pub-balde');
+    const slM = document.getElementById('pub-m');
+    const stP = {clave: 'balde1', m: Math.round(PUB.find(b => b.clave === 'balde1').margen_pct * 100)};
+    slM.value = stP.m;
+    function renderPub() {
+      segB.innerHTML = PUB.map(b => `<button type="button" aria-pressed="${b.clave === stP.clave}" data-v="${b.clave}">${esc(b.producto.replace('Balde ', ''))}</button>`).join('');
+      segB.querySelectorAll('button').forEach(x => x.addEventListener('click', () => {
+        stP.clave = x.dataset.v; stP.m = Math.round(PUB.find(b => b.clave === stP.clave).margen_pct * 100); slM.value = stP.m; renderPub(); }));
+      const b = PUB.find(x => x.clave === stP.clave);
+      const precio = Math.ceil(b.costo / (1 - stP.m / 100) - 1e-9);
+      const mReal = (precio - b.costo) / precio;
+      const porKg = precio / b.peso_kg;
+      document.getElementById('pub-m-txt').textContent = '· ' + stP.m + '%';
+      document.getElementById('pub-out-precio').textContent = fmtS(precio);
+      document.getElementById('pub-out-sub').textContent = `precio al público (sin IGV) · ${fmtS2(porKg)} por kg · porción de 30 g ${fmtS2(porKg * 0.03)}`;
+      document.getElementById('pub-cascada').innerHTML = `
+        <div class="cc-cascade-row"><span class="k">Costo del balde</span><span class="v">${fmtS2(b.costo)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Gana Mr. Peanutt</span><span class="v">${fmtS2(precio - b.costo)} (${fmtPct(mReal)})</span></div>
+        <div class="cc-cascade-row"><span class="k">Paga el restaurante (Comercial)</span><span class="v">${fmtS2(b.precio_restaurante_con_igv)}</span></div>
+        <div class="cc-cascade-row"><span class="k">Frasco al público, por kg</span><span class="v">${fmtS2(b.pvp_frasco_por_kg)}</span></div>
+        <div class="cc-cascade-row is-total"><span class="k">Recomendado</span><span class="v">${fmtS(b.precio_recomendado)}</span></div>`;
+      const v = document.getElementById('pub-verdict');
+      if (mReal < 0.4999) { v.className = 'cc-sim-verdict is-bad'; v.textContent = `Por debajo del margen mínimo de 50%: a ${fmtS(precio)} no se cubre el piso que pusiste.`; }
+      else if (precio < b.precio_restaurante_con_igv) { v.className = 'cc-sim-verdict is-warn'; v.textContent = `Ojo: a ${fmtS(precio)} el público paga menos que el restaurante (${fmtS(b.precio_restaurante_con_igv)}). El restaurante dejaría de comprarte por B2B.`; }
+      else { v.className = 'cc-sim-verdict is-good'; v.textContent = `Sirve: margen ${fmtPct(mReal)} y el público paga ${fmtS(precio - b.precio_restaurante_con_igv)} más que el restaurante. El kilo sale ${fmtPct(1 - porKg / b.pvp_frasco_por_kg)} más barato que en frasco.`; }
+    }
+    slM.addEventListener('input', () => { stP.m = Number(slM.value); renderPub(); });
+    renderPub();
   }
 
   // ================= PUNTO DE EQUILIBRIO =================

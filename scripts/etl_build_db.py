@@ -29,8 +29,13 @@ Supuestos de negocio (todos marcados como tales y revisables al inicio del archi
   A3. Por B2B (tiendas) SOLO se venden maní y almendra (decisión del usuario, 2026-09-18);
       chocomaní y crunchy van únicamente por el canal directo. El tramo de descuento se define por
       el TOTAL del pedido sumando ambos productos, y el descuento del tramo se aplica a los dos.
-  A4. El balde de 1 kg solo trae el costo del envase (S/3.00): se le propone el costeo completo
-      envase + 1 kg de mantequilla + etiqueta (misma etiqueta de S/1.70 que el de 4 kg).
+  A4. El costo de los envases de balde sale de la COMPRA REAL (2026-10-02), no del Excel: 12 baldes
+      de 1 kg por S/36 (S/3.00 c/u) y 12 baldes de 4 L por S/55 (S/4.58 c/u; el Excel decía S/5.19).
+      Costo del balde = envase + kg x costo de la mantequilla (H8) + etiqueta (S/1.70, asumida igual
+      para los dos tamaños).
+  A5. Balde de almendra (SIMULACIÓN): la mantequilla de almendra por kg se saca del frasco, restándole
+      al costo del frasco de almendra lo mismo que el frasco de maní tiene de envase y otros:
+      (11.00 - (5.80 - 0.15 x 10)) / 0.15 = S/44.67/kg (la almendra cruda está a S/40/kg, H7).
 """
 import datetime
 import sqlite3
@@ -80,6 +85,20 @@ PACKS_PROPUESTA = [
 ]
 MARGEN_PROMO_MINIMO = 0.50
 
+# Packs VIP (decisión del usuario, 2026-09-25): precios SOLO para clientes fidelizados. Los packs de arriba
+# (PACKS_PROPUESTA) siguen siendo los OFICIALES para el público. Misma mecánica "arma tu pack": el precio depende
+# solo de la cantidad de frascos; el único pack con precio propio es 2 almendras (S/42). No hay pack VIP de solo
+# almendra x3/x4: si el cliente elige 3 o 4 almendras paga el precio del pack por cantidad (y el margen cae a 26.7%).
+# Con 1 almendra el Pack 3 VIP deja 49.3%; los Packs 3 y 4 VIP salen a S/15 por frasco (menos que la tienda en
+# Comercial, S/15.20): por eso deben quedar restringidos a clientes VIP y no publicarse.
+#   (pack, n_frascos, precio_pack, solo_almendra, max_almendra, ejemplo)
+PACKS_VIP = [
+    ("Pack 2 VIP", 2, 35.0, False, 1, {"mani": 1, "chocomani": 1}),
+    ("Pack 3 VIP", 3, 45.0, False, 1, {"mani": 1, "chocomani": 1, "almendra": 1}),
+    ("Pack 4 VIP", 4, 60.0, False, 1, {"mani": 1, "chocomani": 1, "crunchy": 1, "almendra": 1}),
+    ("Pack almendra x2 VIP", 2, 42.0, True, 2, {"almendra": 2}),
+]
+
 # Términos y condiciones sugeridos para la mecánica de packs (se muestran tal cual en el dashboard).
 #   (orden, termino, por_que)
 PROMOS_TERMINOS = [
@@ -107,6 +126,11 @@ PROMOS_TERMINOS = [
     (11, "El precio por frasco dentro del pack no debe bajar de lo que paga la tienda en Comercial (S/15.20 con IGV).",
      "Si el público consigue en el canal directo un precio igual o menor al que paga la tienda, la tienda deja de comprar. "
      "Pack 3 a S/51 = S/17.00 por frasco y Pack 4 a S/64 = S/16.00: todavía por encima, pero ya cerca del límite."),
+    (12, "Precios VIP (2 frascos S/35, 3 frascos S/45, 4 frascos S/60, 2 almendras S/42) solo para clientes fidelizados: "
+         "no se publican en redes ni en el catálogo.",
+     "Pack 3 y Pack 4 VIP salen a S/15 por frasco, menos que lo que paga la tienda (S/15.20). Si se publican, canibalizan a la tienda "
+     "y al precio oficial. Con 1 almendra el Pack 3 VIP deja 49.3% y el x2 almendra VIP 47.6%: por debajo del piso de 50%, "
+     "aceptable solo como premio de fidelización."),
 ]
 
 # Tramos de la escala B2B PROPUESTA. La compra mínima es POR PEDIDO, con IGV (supuesto A2).
@@ -135,11 +159,38 @@ TRAMOS_RESTAURANTES = [
 #   Almendra: PVP fijo en S/25 (lo fija el canal directo). Se mantienen los márgenes del Excel
 #   (30 / 22 / 19 / 15): la tienda gana 26-39%. Subir el margen dejaría a la tienda por debajo de 25%.
 #   Baldes: se mantienen los márgenes del Excel (59 / 52 / 45.8 / 41.2), solo se redondea el precio.
+#   Baldes de almendra (SIMULACIÓN, 2026-10-02): 40 / 35 / 30 / 25. Más bajo en % que el maní porque el kilo
+#   cuesta 4.5 veces más (en soles gana más por balde), pero por encima de la escala de frascos de almendra
+#   (30 / 22 / 19 / 15) porque el balde no tiene que dejarle margen de reventa a nadie.
 MARGEN_PROPUESTA = {
     "mani": {1: 0.55, 2: 0.50, 3: 0.45, 4: 0.40},
     "almendra": {1: 0.30, 2: 0.22, 3: 0.19, 4: 0.15},
     "balde": {1: 0.59, 2: 0.52, 3: 0.458, 4: 0.412},
+    "balde_almendra": {1: 0.40, 2: 0.35, 3: 0.30, 4: 0.25},
 }
+
+# Compra real de envases de balde (dato del usuario, 2026-10-02). El costo unitario reemplaza al del Excel.
+#   (clave, envase, unidades, total_pagado, celda Excel que reemplaza)
+COMPRAS_ENVASES_BALDE = [
+    ("balde1", "Balde 1 kg", 12, 36.0, "F16"),
+    ("balde4", "Balde 4 L (para 4 kg)", 12, 55.0, "C16"),
+]
+
+# Baldes que se costean: (clave, nombre, peso_kg, envase, insumo, estado). insumo = "mani" | "almendra".
+BALDES = [
+    ("balde4", "Balde 4 kg", 4.0, "balde4", "mani", "Real"),
+    ("balde1", "Balde 1 kg", 1.0, "balde1", "mani", "Real"),
+    ("balde4_alm", "Balde almendra 4 kg", 4.0, "balde4", "almendra", "Simulación"),
+    ("balde1_alm", "Balde almendra 1 kg", 1.0, "balde1", "almendra", "Simulación"),
+]
+
+# Baldes para PÚBLICO FINAL (canal directo, sin IGV por NRUS). Piso: margen mínimo 50% (decisión del usuario,
+# 2026-10-02). Además el público nunca debe pagar menos que el restaurante en el tramo Comercial (precio con IGV):
+# si no, el restaurante dejaría de comprar por B2B. Precio recomendado = el mayor de los dos, redondeado hacia
+# arriba a múltiplos de S/5.
+MARGEN_PUBLICO_BALDE_MINIMO = 0.50
+MARGENES_ESCENARIO_PUBLICO = [0.50, 0.55, 0.60, 0.65, 0.70]
+PASO_REDONDEO_PUBLICO = 5.0
 # Redondeo del precio con IGV en la propuesta (lo que se comunica al cliente).
 PASO_REDONDEO_FRASCO = 0.10
 PASO_REDONDEO_BALDE = 1.00
@@ -248,6 +299,14 @@ def leer_insumos(path):
     insumos["umbral_balde"] = {1: 0.0, 2: 400.0, 3: 650.0, 4: 900.0}
     insumos["umbral_frasco"] = {1: 0.0, 2: 700.0, 3: 1000.0, 4: 1600.0}
     insumos["umbral_frasco_comercial_txt"] = v("A31")   # "Pedidos menores a 500" (hueco 500-700)
+    # Envases de balde: manda la compra real (A4); se guarda el valor del Excel para comparar.
+    for clave, _env, unidades, total, _celda in COMPRAS_ENVASES_BALDE:
+        insumos[f"{clave}_envase_excel"] = insumos[f"{clave}_envase"]
+        insumos[f"{clave}_envase"] = round(total / unidades, 2)
+    # Mantequilla de almendra por kg (A5): costo del frasco de almendra menos el envase y otros del frasco de maní.
+    otros_frasco = float(v("C3")) - 0.15 * insumos["costo_mantequilla_kg"]
+    insumos["otros_frasco"] = otros_frasco
+    insumos["costo_mant_almendra_kg"] = (float(v("C4")) - otros_frasco) / 0.15
     return insumos
 
 
@@ -274,6 +333,33 @@ DROP TABLE IF EXISTS punto_equilibrio;
 DROP TABLE IF EXISTS issues;
 DROP TABLE IF EXISTS recomendaciones;
 DROP TABLE IF EXISTS meta;
+DROP TABLE IF EXISTS compras_envases;
+DROP TABLE IF EXISTS baldes_publico;
+DROP TABLE IF EXISTS baldes_publico_escenarios;
+
+-- Compra real de envases de balde: de aquí sale el costo del envase.
+CREATE TABLE compras_envases (
+    id INTEGER PRIMARY KEY,
+    clave TEXT, envase TEXT, unidades INTEGER, total_pagado REAL, costo_unitario REAL,
+    costo_excel REAL, diferencia_vs_excel REAL, celda_excel TEXT
+);
+
+-- Baldes a público final (canal directo, sin IGV): precio recomendado y comparación con restaurante y frasco.
+CREATE TABLE baldes_publico (
+    id INTEGER PRIMARY KEY,
+    clave TEXT, producto TEXT, insumo TEXT, estado TEXT, peso_kg REAL, costo REAL,
+    precio_margen_minimo REAL, precio_restaurante_con_igv REAL, precio_recomendado REAL,
+    margen_pct REAL, ganancia REAL, precio_por_kg REAL, costo_porcion REAL,
+    pvp_frasco_por_kg REAL, ahorro_vs_frasco_pct REAL, sobre_restaurante_pct REAL,
+    criterio TEXT, comentario TEXT
+);
+
+-- Precio de cada balde a público final según el margen (escenarios).
+CREATE TABLE baldes_publico_escenarios (
+    id INTEGER PRIMARY KEY,
+    clave TEXT, producto TEXT, margen_objetivo_pct REAL, precio REAL, margen_real_pct REAL, ganancia REAL,
+    precio_por_kg REAL, precio_restaurante_con_igv REAL, debajo_de_restaurante INTEGER
+);
 
 CREATE TABLE meta (clave TEXT PRIMARY KEY, valor TEXT);
 
@@ -327,6 +413,22 @@ CREATE TABLE promociones_propuesta (
 
 -- Todas las mezclas posibles de cada pack, con su descuento y margen.
 CREATE TABLE promociones_ejemplos (
+    id INTEGER PRIMARY KEY,
+    pack TEXT, n_frascos INTEGER, precio_pack REAL, mezcla TEXT, n_almendra INTEGER,
+    costo REAL, sueltos REAL, descuento_pct REAL, ahorro REAL, margen_pct REAL, ganancia REAL, ganancia_cedida REAL
+);
+
+-- Packs VIP (solo clientes fidelizados): mismas columnas que promociones_propuesta / promociones_ejemplos.
+CREATE TABLE packs_vip (
+    id INTEGER PRIMARY KEY,
+    pack TEXT, n_frascos INTEGER, precio_pack REAL, precio_por_frasco REAL, regla TEXT, combos_posibles INTEGER,
+    costo_min REAL, costo_max REAL, sueltos_min REAL, sueltos_max REAL,
+    descuento_min_pct REAL, descuento_max_pct REAL, ahorro_min REAL, ahorro_max REAL,
+    margen_min_pct REAL, margen_max_pct REAL, mezcla_peor_margen TEXT, mezcla_mayor_descuento TEXT,
+    ganancia_min REAL, ganancia_max REAL, cumple_minimo INTEGER,
+    ejemplo TEXT, ejemplo_sueltos REAL, ejemplo_ahorro REAL, ejemplo_margen_pct REAL
+);
+CREATE TABLE packs_vip_mezclas (
     id INTEGER PRIMARY KEY,
     pack TEXT, n_frascos INTEGER, precio_pack REAL, mezcla TEXT, n_almendra INTEGER,
     costo REAL, sueltos REAL, descuento_pct REAL, ahorro REAL, margen_pct REAL, ganancia REAL, ganancia_cedida REAL
@@ -435,9 +537,15 @@ def load_parametros(cx, I):
         ("costo_almendra_kg", "Costo de almendras", I["costo_almendra_kg"], "S/ por kg", "H7", ""),
         ("ref_I7", "Celda I7 (=H7/5) sin uso en las fórmulas", float(I["ref_I7"]) if I["ref_I7"] is not None else None, "S/", "I7", "Referencia suelta; ver issues"),
         ("ref_J7", "Celda J7 sin uso en las fórmulas", float(I["ref_J7"]) if I["ref_J7"] is not None else None, "S/", "J7", "Referencia suelta; ver issues"),
-        ("balde4_envase", "Envase balde 4 kg", I["balde4_envase"], "S/ por unidad", "C16", ""),
-        ("balde1_envase", "Envase balde 1 kg", I["balde1_envase"], "S/ por unidad", "F16", ""),
+        ("balde4_envase", "Envase balde 4 L (4 kg)", I["balde4_envase"], "S/ por unidad", "Compra 2026-10-02",
+         f"12 u x S/55. El Excel (C16) decía S/{I['balde4_envase_excel']:.2f}"),
+        ("balde1_envase", "Envase balde 1 kg", I["balde1_envase"], "S/ por unidad", "Compra 2026-10-02",
+         f"12 u x S/36. Igual al Excel (F16)"),
         ("balde_etiqueta", "Etiqueta del balde", I["balde_etiqueta"], "S/ por unidad", "C18", "Asumida igual para el balde de 1 kg (A4)"),
+        ("costo_mant_almendra_kg", "Mantequilla de almendra por kg (para el balde simulado)", r2(I["costo_mant_almendra_kg"]),
+         "S/ por kg", "Calculado (A5)", f"Frasco almendra S/11 - envase y otros S/{I['otros_frasco']:.2f}, entre 0.15 kg"),
+        ("margen_publico_balde_minimo", "Margen mínimo de los baldes a público final", MARGEN_PUBLICO_BALDE_MINIMO, "%",
+         "Decisión 2026-10-02", "Además, nunca por debajo del precio Comercial del restaurante"),
         ("canal_directo_igv", "IGV en el canal directo (NRUS: no se cobra)", 0.0, "%", "Decisión 2026-09-18", "El PVP es precio neto"),
         ("margen_promo_minimo", "Margen mínimo de cualquier promoción del canal directo", MARGEN_PROMO_MINIMO, "%", "Propuesta", ""),
         ("porcion_gr", "Porción de referencia para restaurantes", PORCION_GR, "gramos", "Propuesta", "Untado de un sándwich / crepe"),
@@ -459,31 +567,37 @@ def load_productos(cx, I):
         rows.append((clave, nombre.strip(), "FRASCO", "Frasco 150 g", 0.15, costo, costo / 0.15,
                      r2(insumo), r2(costo - insumo), "Excel", f"Hoja 1!{celda}"))
         costos[clave] = costo
-    balde4 = I["balde4_envase"] + I["balde4_kg"] * kg_mant + I["balde_etiqueta"]
-    balde1 = I["balde1_envase"] + 1.0 * kg_mant + I["balde_etiqueta"]
-    rows.append(("balde4", "Mr. Peanutt Balde 4 kg", "BALDE", "Balde 4 kg", 4.0, r2(balde4), r2(balde4 / 4),
-                 r2(4 * kg_mant), r2(I["balde4_envase"] + I["balde_etiqueta"]), "Excel", "Hoja 1!C16:C19"))
-    rows.append(("balde1", "Mr. Peanutt Balde 1 kg", "BALDE", "Balde 1 kg", 1.0, r2(balde1), r2(balde1),
-                 r2(kg_mant), r2(I["balde1_envase"] + I["balde_etiqueta"]), "Propuesto (A4)", "Hoja 1!F16 + supuesto"))
-    costos["balde4"], costos["balde1"] = balde4, balde1
+    kg_insumo = {"mani": (kg_mant, "Mantequilla de maní", "H8"),
+                 "almendra": (I["costo_mant_almendra_kg"], "Mantequilla de almendra", "calculado (A5)")}
+    compra = {c: (u, t) for c, _e, u, t, _x in COMPRAS_ENVASES_BALDE}
+    det = []
+    for clave, nombre, peso, env, insumo, estado in BALDES:
+        envase = I[f"{env}_envase"]
+        kg, nombre_ins, fuente_ins = kg_insumo[insumo]
+        costo = envase + peso * kg + I["balde_etiqueta"]
+        costos[clave] = costo
+        u, t = compra[env]
+        rows.append((clave, f"Mr. Peanutt {nombre}", "BALDE", nombre, peso, r2(costo), r2(costo / peso),
+                     r2(peso * kg), r2(envase + I["balde_etiqueta"]), estado,
+                     f"Envase: compra {u} u x S/{t:.0f}; {nombre_ins.lower()} {fuente_ins}; etiqueta C18"))
+        det += [
+            (nombre, "Envase (balde)", 1, "unidad", envase, envase, "Real", f"Compra {u} u x S/{t:.0f}"),
+            (nombre, nombre_ins, peso, "kg", r2(kg), r2(peso * kg), estado if insumo == "almendra" else "Excel", fuente_ins),
+            (nombre, "Etiqueta", 1, "unidad", I["balde_etiqueta"], I["balde_etiqueta"], "Excel", "C18"),
+            (nombre, "COSTO TOTAL", None, None, None, r2(costo), estado, "suma"),
+        ]
     cx.executemany("""INSERT INTO productos_costeo
         (clave, producto, familia, presentacion, peso_kg, costo_unitario, costo_por_kg,
          costo_insumo_principal_est, costo_envase_y_otros_est, estado, fuente)
         VALUES (?,?,?,?,?,?,?,?,?,?,?)""", rows)
-
-    det = [
-        ("Balde 4 kg", "Envase (balde)", 1, "unidad", I["balde4_envase"], I["balde4_envase"], "Excel", "C16"),
-        ("Balde 4 kg", "Mantequilla de maní", 4, "kg", kg_mant, 4 * kg_mant, "Excel", "C17 (=4*10)"),
-        ("Balde 4 kg", "Etiqueta", 1, "unidad", I["balde_etiqueta"], I["balde_etiqueta"], "Excel", "C18"),
-        ("Balde 4 kg", "COSTO TOTAL", None, None, None, r2(balde4), "Excel", "C19"),
-        ("Balde 1 kg", "Envase (balde)", 1, "unidad", I["balde1_envase"], I["balde1_envase"], "Excel", "F16"),
-        ("Balde 1 kg", "Mantequilla de maní", 1, "kg", kg_mant, kg_mant, "Propuesto", "H8 x 1 kg"),
-        ("Balde 1 kg", "Etiqueta", 1, "unidad", I["balde_etiqueta"], I["balde_etiqueta"], "Propuesto (A4)", "misma etiqueta C18"),
-        ("Balde 1 kg", "COSTO TOTAL", None, None, None, r2(balde1), "Propuesto", "suma"),
-    ]
     cx.executemany("""INSERT INTO costeo_balde_detalle
         (producto, componente, cantidad, unidad, costo_unitario, costo_total, estado, fuente)
         VALUES (?,?,?,?,?,?,?,?)""", det)
+    cx.executemany("""INSERT INTO compras_envases
+        (clave, envase, unidades, total_pagado, costo_unitario, costo_excel, diferencia_vs_excel, celda_excel)
+        VALUES (?,?,?,?,?,?,?,?)""",
+        [(c, e, u, t, I[f"{c}_envase"], I[f"{c}_envase_excel"], r2(I[f"{c}_envase"] - I[f"{c}_envase_excel"]), x)
+         for c, e, u, t, x in COMPRAS_ENVASES_BALDE])
     return costos
 
 
@@ -563,11 +677,14 @@ def _texto_mezcla(comp):
     return " + ".join(f"{comp[k]} {NOMBRE_CORTO[k]}" if comp[k] > 1 else NOMBRE_CORTO[k] for k in orden if comp.get(k))
 
 
-def load_promociones_propuesta(cx, costos, pvp):
+def load_promociones_propuesta(cx, costos, pvp, packs_def=None, t_packs="promociones_propuesta",
+                               t_mezclas="promociones_ejemplos", oficiales=True):
+    """Packs oficiales (con términos y escenarios) o, con oficiales=False, otra lista de packs (p. ej. VIP)."""
+    packs_def = PACKS_PROPUESTA if packs_def is None else packs_def
     packs, ejemplos, escenarios = [], [], []
     # Precio al que la tienda compra en Comercial (con IGV): piso de referencia para el precio por frasco del pack.
     p_tienda = cx.execute("SELECT precio_con_igv FROM escala_b2b_propuesta WHERE clave='mani' AND tramo=1").fetchone()[0]
-    for pack, n, precio, solo_alm, max_alm, ejemplo in PACKS_PROPUESTA:
+    for pack, n, precio, solo_alm, max_alm, ejemplo in packs_def:
         mezclas = _mezclas(n, solo_alm, max_alm)
         costo_peor = max(sum(costos[k] * v for k, v in c.items()) for c in mezclas)
         costo_mejor = min(sum(costos[k] * v for k, v in c.items()) for c in mezclas)
@@ -575,7 +692,7 @@ def load_promociones_propuesta(cx, costos, pvp):
         s_max = max(sum(pvp[k] * v for k, v in c.items()) for c in mezclas)
         if precio is None:
             precio = float(round(costo_peor / (1 - MARGEN_OBJETIVO_PACK[n])))
-        if True:   # escenarios para todos los packs, incluidos los de solo almendra
+        if oficiales:   # escenarios para todos los packs oficiales, incluidos los de solo almendra
             for m_obj in MARGENES_ESCENARIO_PACK:
                 p_esc = float(round(costo_peor / (1 - m_obj)))
                 escenarios.append((pack, n, m_obj, p_esc, r2(p_esc / n), r2(costo_peor),
@@ -605,14 +722,16 @@ def load_promociones_propuesta(cx, costos, pvp):
                       r2(min(f[6] for f in filas)), r2(max(f[6] for f in filas)),
                       1 if peor[5] >= MARGEN_PROMO_MINIMO else 0,
                       _texto_mezcla(ejemplo), r2(ej_suma), r2(ej_suma - precio), r4(margen_sobre_precio(ej_costo, precio))))
-    cx.executemany("""INSERT INTO promociones_propuesta
+    cx.executemany(f"""INSERT INTO {t_packs}
         (pack, n_frascos, precio_pack, precio_por_frasco, regla, combos_posibles, costo_min, costo_max, sueltos_min, sueltos_max,
          descuento_min_pct, descuento_max_pct, ahorro_min, ahorro_max, margen_min_pct, margen_max_pct, mezcla_peor_margen,
          mezcla_mayor_descuento, ganancia_min, ganancia_max, cumple_minimo, ejemplo, ejemplo_sueltos, ejemplo_ahorro,
          ejemplo_margen_pct) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", packs)
-    cx.executemany("""INSERT INTO promociones_ejemplos
+    cx.executemany(f"""INSERT INTO {t_mezclas}
         (pack, n_frascos, precio_pack, mezcla, n_almendra, costo, sueltos, descuento_pct, ahorro, margen_pct, ganancia, ganancia_cedida)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""", ejemplos)
+    if not oficiales:
+        return
     cx.executemany("INSERT INTO promociones_terminos (orden, termino, por_que) VALUES (?,?,?)", PROMOS_TERMINOS)
     cx.executemany("""INSERT INTO packs_escenarios
         (pack, n_frascos, margen_objetivo_pct, precio_pack, precio_por_frasco, costo_peor_mezcla, margen_min_pct, margen_max_pct,
@@ -639,8 +758,8 @@ def _fila_escala(segmento, producto, tramo, nombre, condicion, umbral, costo, ma
 
 def load_escala_excel(cx, I, costos, pvp):
     rows = []
-    # Restaurantes: balde 4 kg
-    c = costos["balde4"]
+    # Restaurantes: balde 4 kg (as-is: con el costo de envase que traía el Excel, C16)
+    c = I["balde4_envase_excel"] + I["balde4_kg"] * I["costo_mantequilla_kg"] + I["balde_etiqueta"]
     base_sin = precio_desde_margen(c, I["escala_balde"][0][3])
     for tramo, cond, nombre, margen, _h in I["escala_balde"]:
         cond = cond or "Compra base (1-2 baldes)"
@@ -731,12 +850,14 @@ def load_escala_propuesta(cx, I, costos, pvp):
         rows.extend(grupo)
 
     # --- Restaurantes: baldes ---
-    for clave, nombre, peso in (("balde4", "Balde 4 kg", 4.0), ("balde1", "Balde 1 kg", 1.0)):
+    m_excel["balde_almendra"] = {}
+    for clave, nombre, peso, _env, insumo, estado in BALDES:
         costo = costos[clave]
-        extra = "costeo propuesto (A4)" if clave == "balde1" else ""
+        fam = "balde_almendra" if insumo == "almendra" else "balde"
+        extra = "simulación" if estado == "Simulación" else "costo con envase real"
         grupo = []
         for tramo, nombre_t, baldes_min, cond in TRAMOS_RESTAURANTES:
-            g = fila("RESTAURANTES", nombre, clave, "balde", costo, peso, tramo, nombre_t, cond, None, baldes_min,
+            g = fila("RESTAURANTES", nombre, clave, fam, costo, peso, tramo, nombre_t, cond, None, baldes_min,
                      None, PASO_REDONDEO_BALDE, extra)
             grupo.append(g)
         base_sin = grupo[0][11]
@@ -806,22 +927,69 @@ def load_cadena_valor(cx, costos, pvp, precios):
 
 def load_restaurantes_porcion(cx, costos, precios):
     rows = []
-    # Referencia: frasco de maní 150 g al precio Comercial B2B propuesto
-    frasco_con = precios[("mani", 1)]
-    frasco_kg = frasco_con / 0.15
-    rows.append(("Frasco 150 g (precio Comercial tiendas)", 1, "Comercial", frasco_con, 0.15, r2(frasco_kg), PORCION_GR,
-                 r2(frasco_kg * PORCION_GR / 1000), 0.0,
-                 r4(margen_sobre_precio(costos["mani"], frasco_con / _IGV)), r2((frasco_con / _IGV - costos["mani"]) / 0.15)))
-    for clave, nombre, peso in (("balde4", "Balde 4 kg", 4.0), ("balde1", "Balde 1 kg (propuesto)", 1.0)):
-        for tramo, nombre_t, _b, _c in TRAMOS_RESTAURANTES:
-            con = precios[(clave, tramo)]
-            por_kg = con / peso
-            rows.append((nombre, tramo, nombre_t, con, peso, r2(por_kg), PORCION_GR, r2(por_kg * PORCION_GR / 1000),
-                         r4(1 - por_kg / frasco_kg), r4(margen_sobre_precio(costos[clave], con / _IGV)),
-                         r2((con / _IGV - costos[clave]) / peso)))
+    # Referencia: el frasco 150 g del mismo insumo al precio Comercial B2B propuesto
+    for insumo, etiqueta in (("mani", "maní"), ("almendra", "almendra")):
+        frasco_con = precios[(insumo, 1)]
+        frasco_kg = frasco_con / 0.15
+        rows.append((f"Frasco {etiqueta} 150 g (precio Comercial tiendas)", 1, "Comercial", frasco_con, 0.15, r2(frasco_kg),
+                     PORCION_GR, r2(frasco_kg * PORCION_GR / 1000), 0.0,
+                     r4(margen_sobre_precio(costos[insumo], frasco_con / _IGV)),
+                     r2((frasco_con / _IGV - costos[insumo]) / 0.15)))
+        for clave, nombre, peso, _env, ins, estado in BALDES:
+            if ins != insumo:
+                continue
+            for tramo, nombre_t, _b, _c in TRAMOS_RESTAURANTES:
+                con = precios[(clave, tramo)]
+                por_kg = con / peso
+                rows.append((nombre + (" (simulación)" if estado == "Simulación" else ""), tramo, nombre_t, con, peso,
+                             r2(por_kg), PORCION_GR, r2(por_kg * PORCION_GR / 1000),
+                             r4(1 - por_kg / frasco_kg), r4(margen_sobre_precio(costos[clave], con / _IGV)),
+                             r2((con / _IGV - costos[clave]) / peso)))
     cx.executemany("""INSERT INTO restaurantes_porcion
         (formato, tramo, nombre_tramo, precio_con_igv, peso_kg, precio_por_kg_con_igv, porcion_gr, costo_porcion,
          ahorro_vs_frasco_pct, margen_mrpeanutt_pct, ganancia_mrpeanutt_por_kg) VALUES (?,?,?,?,?,?,?,?,?,?,?)""", rows)
+
+
+def load_baldes_publico(cx, costos, precios, pvp):
+    """Baldes a público final (canal directo, sin IGV). Precio recomendado = el mayor entre el precio que deja el
+    margen mínimo (50%) y el precio Comercial con IGV del restaurante, redondeado hacia arriba a S/5."""
+    import math
+    rows, esc = [], []
+    for clave, nombre, peso, _env, insumo, estado in BALDES:
+        costo = costos[clave]
+        p_min = precio_desde_margen(costo, MARGEN_PUBLICO_BALDE_MINIMO)
+        p_rest = precios[(clave, 1)]
+        rec = math.ceil(max(p_min, p_rest) / PASO_REDONDEO_PUBLICO - 1e-9) * PASO_REDONDEO_PUBLICO
+        m = margen_sobre_precio(costo, rec)
+        por_kg = rec / peso
+        frasco_kg = pvp[insumo] / 0.15
+        if p_rest >= p_min:
+            criterio = (f"Manda el restaurante: con 50% saldría a S/{p_min:.2f}, menos de lo que paga el restaurante "
+                        f"(S/{p_rest:.0f} con IGV). Se sube a S/{rec:.0f}.")
+        else:
+            criterio = f"Manda el margen mínimo: 50% = S/{p_min:.2f}, redondeado a S/{rec:.0f}."
+        if insumo == "almendra" and peso >= 4:
+            coment = "Ticket muy alto para un consumidor final: no publicarlo, solo a pedido."
+        elif insumo == "almendra":
+            coment = "Simulación: la almendra solo aguanta ~50%; es el formato de almendra para público final."
+        elif peso >= 4:
+            coment = "Para el cliente que consume mucho (gimnasio, familia, emprendedor chico)."
+        else:
+            coment = "Formato de entrada para público final: el más fácil de vender."
+        rows.append((clave, nombre, insumo, estado, peso, r2(costo), r2(p_min), p_rest, rec, r4(m), r2(rec - costo),
+                     r2(por_kg), r2(por_kg * PORCION_GR / 1000), r2(frasco_kg), r4(1 - por_kg / frasco_kg),
+                     r4(rec / p_rest - 1), criterio, coment))
+        for m_obj in MARGENES_ESCENARIO_PUBLICO:
+            p = float(math.ceil(precio_desde_margen(costo, m_obj) - 1e-9))
+            esc.append((clave, nombre, m_obj, p, r4(margen_sobre_precio(costo, p)), r2(p - costo), r2(p / peso),
+                        p_rest, 1 if p < p_rest else 0))
+    cx.executemany("""INSERT INTO baldes_publico
+        (clave, producto, insumo, estado, peso_kg, costo, precio_margen_minimo, precio_restaurante_con_igv,
+         precio_recomendado, margen_pct, ganancia, precio_por_kg, costo_porcion, pvp_frasco_por_kg,
+         ahorro_vs_frasco_pct, sobre_restaurante_pct, criterio, comentario) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", rows)
+    cx.executemany("""INSERT INTO baldes_publico_escenarios
+        (clave, producto, margen_objetivo_pct, precio, margen_real_pct, ganancia, precio_por_kg,
+         precio_restaurante_con_igv, debajo_de_restaurante) VALUES (?,?,?,?,?,?,?,?,?)""", esc)
 
 
 def load_resumen_margenes(cx):
@@ -869,7 +1037,7 @@ def load_punto_equilibrio(cx, cf):
              "Si todo se vendiera por canal directo a este producto (sin IGV, NRUS).", igv=False)
     for (seg, producto, clave, tramo, nombre, m, p_sin, p_con) in cx.execute(
             "SELECT segmento, producto, clave, tramo, nombre_tramo, margen_mrpeanutt_pct, precio_sin_igv, precio_con_igv "
-            "FROM escala_b2b_propuesta WHERE tramo IN (1, 4) AND clave <> 'balde1' ORDER BY id"):
+            "FROM escala_b2b_propuesta WHERE tramo IN (1, 4) AND clave NOT IN ('balde1', 'balde4_alm', 'balde1_alm') ORDER BY id"):
         canal = "Tiendas" if seg == "TIENDAS" else "Restaurantes"
         fila(f"{canal} - {producto} - {nombre}", canal, producto, clave, nombre, m, p_sin, p_con,
              f"Si todo se vendiera a {canal.lower()} en el tramo {nombre}.")
@@ -942,7 +1110,14 @@ def load_issues(cx, I, pvp):
                      "se venden únicamente por el canal directo. Supuesto A3."),
         ("baja", "Costeo", arch, hoja, "E15:F16",
          "El balde de 1 kg solo tiene el costo del envase (S/3.00); falta mantequilla y etiqueta.",
-         "mitigado", "Propuesta: S/3.00 + 1 kg x S/10 + etiqueta S/1.70 = S/14.70. Supuesto A4."),
+         "resuelto", "Compra real 2026-10-02: 12 baldes de 1 kg por S/36 (S/3.00 c/u). Costo = S/3.00 + 1 kg x S/10 + "
+                     "etiqueta S/1.70 = S/14.70. Supuesto A4."),
+        ("media", "Costeo", arch, hoja, "C16",
+         f"El envase del balde de 4 kg figuraba a S/{I['balde4_envase_excel']:.2f}; la compra real salió a "
+         f"S/{I['balde4_envase']:.2f} (12 baldes de 4 L por S/55).",
+         "resuelto", f"Se usa el costo real: balde 4 kg = S/{I['balde4_envase']:.2f} + 4 kg x S/10 + S/1.70 = "
+                     f"S/{I['balde4_envase'] + 4 * I['costo_mantequilla_kg'] + I['balde_etiqueta']:.2f} (antes S/46.89). "
+                     "Los precios de la escala bajan S/1-2 por balde con el mismo margen."),
         ("baja", "Costeo", arch, hoja, "I7:J7",
          "Las celdas I7 (=H7/5 = 8) y J7 (10.2) no se usan en ninguna fórmula; parecen un tanteo del costo de la almendra.",
          "pendiente", "Confirmar si el costo S/11 del frasco de almendra ya incluye envase y mano de obra."),
@@ -967,6 +1142,9 @@ def load_recomendaciones(cx):
     kg4 = cx.execute("SELECT precio_por_kg_con_igv FROM escala_b2b_propuesta WHERE clave='balde4' AND tramo=1").fetchone()[0]
     kg1 = cx.execute("SELECT precio_por_kg_con_igv FROM escala_b2b_propuesta WHERE clave='balde1' AND tramo=1").fetchone()[0]
     cf_total = cx.execute("SELECT SUM(monto_mensual) FROM costos_fijos").fetchone()[0]
+    ba4 = " / ".join(f"S/{P[('balde4_alm', t)][0]:.0f}" for t in (1, 2, 3, 4))
+    ba1 = " / ".join(f"S/{P[('balde1_alm', t)][0]:.0f}" for t in (1, 2, 3, 4))
+    pub = {c: (p, m) for c, p, m in cx.execute("SELECT clave, precio_recomendado, margen_pct FROM baldes_publico")}
     cx.row_factory = sqlite3.Row
     pe_cons = cx.execute("SELECT * FROM punto_equilibrio WHERE es_conservador=1").fetchone()
     pe_dir = cx.execute("SELECT * FROM punto_equilibrio WHERE canal='Directo' AND clave='mani'").fetchone()
@@ -988,7 +1166,7 @@ def load_recomendaciones(cx):
         (4, "Restaurantes", f"Vender el balde de 4 kg por cantidad (1-3 / 4-6 / 7-9 / 10+ baldes): {b4} con IGV. "
             f"Comunicar el costo por porción de {PORCION_GR:.0f} g (S/{porc[1]:.2f} -> S/{porc[4]:.2f}), no el descuento.",
          "Margen Mr. Peanutt 59 -> 41%; el restaurante paga ~70-77% menos por kg que en frasco."),
-        (5, "Restaurantes", f"Lanzar el balde de 1 kg (costo propuesto S/14.70) con la misma escala: {b1} con IGV.",
+        (5, "Restaurantes", f"Lanzar el balde de 1 kg (costo real S/14.70: envase S/3 + 1 kg + etiqueta) con la misma escala: {b1} con IGV.",
          f"Formato de entrada para cafeterías chicas; S/{kg1:.0f}/kg vs S/{kg4:.2f}/kg del balde de 4 kg."),
         (6, "Promociones", "Mecánica 'arma tu pack' con precio fijo por cantidad: 2 frascos S/42, 3 frascos S/51, 4 frascos S/64 "
             "(elige sabores, máx. 1 almendra, se puede repetir); packs de solo almendra 2 por S/46 y 3 por S/66. Pack 3 y 4 "
@@ -1004,6 +1182,17 @@ def load_recomendaciones(cx):
         (8, "Control", "Regla para distribuidores: quien compra en Distribuidor/Exclusivo debe revender a tiendas al precio "
             "Comercial (no por debajo) y al público al PVP sugerido.",
          "Mantiene los ~25% del distribuidor y los 30%+ de la tienda sin canibalizar el canal directo."),
+        (9, "Promociones", "Packs VIP solo para clientes fidelizados: 2 frascos S/35, 3 frascos S/45, 4 frascos S/60 y "
+            "2 almendras S/42, con la misma regla de máx. 1 almendra por pack mixto. No publicarlos.",
+         "Margen VIP: Pack 2 51.7-66.9%, Pack 3 49.3-61.3%, Pack 4 52.2-61.3%, almendra x2 47.6%. Sin la regla de "
+         "almendra, 3 o 4 almendras al precio del pack dejan solo 26.7%."),
+        (10, "Restaurantes", f"Balde de almendra (simulación, mantequilla a S/44.67/kg): 4 kg {ba4} y 1 kg {ba1} con IGV, "
+             "márgenes 40 / 35 / 30 / 25%. Ofrecerlo primero a cafeterías de bowls y smoothies, a pedido.",
+         "Gana menos % que el maní pero más soles por balde. Confirmar el costo real del kilo de almendra procesada antes de cotizar."),
+        (11, "Público final", f"Baldes a público final (sin IGV): maní 1 kg S/{pub['balde1'][0]:.0f}, maní 4 kg S/{pub['balde4'][0]:.0f}, "
+             f"almendra 1 kg S/{pub['balde1_alm'][0]:.0f}. El balde de almendra de 4 kg (S/{pub['balde4_alm'][0]:.0f}) solo a pedido.",
+         f"Margen {pub['balde4'][1]*100:.0f}-{pub['balde1'][1]*100:.0f}% en maní y {pub['balde1_alm'][1]*100:.0f}% en almendra. "
+         "El público nunca paga menos que el restaurante en Comercial: si no, el restaurante dejaría de comprar."),
     ]
     cx.executemany("INSERT INTO recomendaciones (prioridad, area, recomendacion, impacto) VALUES (?,?,?,?)", rows)
 
@@ -1024,8 +1213,10 @@ def main():
     load_escala_excel(cx, I, costos, pvp)
     precios = load_escala_propuesta(cx, I, costos, pvp)
     load_promociones_propuesta(cx, costos, pvp)   # después de la escala: usa el precio Comercial de tiendas
+    load_promociones_propuesta(cx, costos, pvp, PACKS_VIP, "packs_vip", "packs_vip_mezclas", oficiales=False)
     load_cadena_valor(cx, costos, pvp, precios)
     load_restaurantes_porcion(cx, costos, precios)
+    load_baldes_publico(cx, costos, precios, pvp)
     load_resumen_margenes(cx)
     cf = load_costos_fijos(cx)
     load_punto_equilibrio(cx, cf)
@@ -1043,7 +1234,7 @@ def main():
     cx.commit()
 
     for t in ("productos_costeo", "canal_directo", "promociones", "promociones_propuesta", "escala_b2b_excel", "escala_b2b_propuesta",
-              "cadena_valor", "restaurantes_porcion", "costos_fijos", "punto_equilibrio", "issues", "recomendaciones"):
+              "cadena_valor", "restaurantes_porcion", "compras_envases", "baldes_publico", "costos_fijos", "punto_equilibrio", "issues", "recomendaciones"):
         n = cx.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
         print(f"  {t:24s} {n:3d} filas")
     cx.close()
