@@ -1,0 +1,4 @@
+# Vercel solo publica el dashboard estático; el resto (Python, BD, Excel) no se sube
+/*
+!/dashboard
+!/vercel.json
